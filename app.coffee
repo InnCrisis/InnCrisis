@@ -9,9 +9,16 @@ app = express()
 app.configure ->
   env = new nunjucks.Environment(new nunjucks.FileSystemLoader('templates'))
   env.express(app)
+  app.use express.errorHandler()
 
   app.use express.favicon __dirname + '/public/images/favicon.ico'
   app.use express.static __dirname + '/public'
+
+  app.use less
+    src: path.join __dirname, 'public'
+    once: true
+    compress: true
+
   app.use express.bodyParser()
   app.use express.methodOverride()
   app.use app.router
@@ -20,7 +27,7 @@ app.configure ->
     res.render '404.html'
 
 app.get '/', (req, res)->
-  req.render 'index.html'
+  res.render 'index.html'
 
 app.use (err, req, res, next)->
   throw err
