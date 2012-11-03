@@ -24,7 +24,9 @@ app = express()
 
 serverURL = 'localhost:3000'
 if process.env.serverURL?
-  sevrerURL = process.env.serverURL
+  serverURL = process.env.serverURL
+
+
 app.configure ->
   env = new nunjucks.Environment(new nunjucks.FileSystemLoader('templates'))
   env.express(app)
