@@ -6,7 +6,10 @@
   </div>
 
   <div class="makePayment">
-    <a class="wepay-widget-button wepay-green" id="wepay_widget_anchor_50954ab77a275" href="https://www.wepay.com/donations/890705390">Donate</a><script type="text/javascript">var WePay = WePay || {};WePay.load_widgets = WePay.load_widgets || function() { };WePay.widgets = WePay.widgets || [];WePay.widgets.push( {object_id: 890705390,widget_type: "donation_campaign",anchor_id: "wepay_widget_anchor_50954ab77a275",widget_options: {list_suggested_donations: true,allow_cover_fee: true,enable_recurring: true,allow_anonymous: true,button_text: "Donate"}});if (!WePay.script) {WePay.script = document.createElement('script');WePay.script.type = 'text/javascript';WePay.script.async = true;WePay.script.src = 'https://static.wepay.com/min/js/widgets.v2.js';var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(WePay.script, s);} else if (WePay.load_widgets) {WePay.load_widgets();}</script>
+    <form method="GET" action="/donate">
+      <input name="amount" required min="1">
+      <input type="submit">
+    </form>
   </div>
   <div class="getARoom">
     <a href="getARoom.html">Get A Room</a>
