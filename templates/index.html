@@ -15,13 +15,45 @@
   </div>
 
   <div class="section">
+
+{#
+    <a class="wepay-widget-button wepay-green" id="wepay_widget_anchor_5095a4ed67795"
+       href="https://stage.wepay.com/donations/1316536832">Donate</a>
+    <script type="text/javascript">var WePay = WePay || {};
+    WePay.load_widgets = WePay.load_widgets || function () {
+    };
+    WePay.widgets = WePay.widgets || [];
+    WePay.widgets.push({
+      object_id: 1316536832,
+      widget_type: "donation_campaign",
+      anchor_id: "wepay_widget_anchor_5095a4ed67795",
+      widget_options: {
+        donor_chooses: true,
+        allow_cover_fee: true,
+        enable_recurring: false,
+        button_text: "Donate",
+        redirect_url: "http://localhost:3000/thankyou"
+      }
+    });
+    if (!WePay.script) {
+      WePay.script = document.createElement('script');
+      WePay.script.type = 'text/javascript';
+      WePay.script.async = true;
+      WePay.script.src = 'https://stage.wepay.com/min/js/widgets.v2.js';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(WePay.script, s);
+    } else if (WePay.load_widgets) {
+      WePay.load_widgets();
+    }</script>
+#}
+
     <a href="/donate" class="button major">Donate</a>
     <a href="/getaroom" class="button minor">Get a Room</a>
   </div>
 
 {#
   <div class="collected">
-    <a class="wepay-widget-button wepay-green" id="wepay_widget_anchor_50954f3fa5f6a" href="https://www.wepay.com/donations/890705390">View Progress</a><script type="text/javascript">var WePay = WePay || {};WePay.load_widgets = WePay.load_widgets || function() { };WePay.widgets = WePay.widgets || [];WePay.widgets.push( {object_id: 890705390,widget_type: "donation_campaign_progress",anchor_id: "wepay_widget_anchor_50954f3fa5f6a",widget_options: {no_dialog: "true",total_collected: "true",button_text: "View Progress"}});if (!WePay.script) {WePay.script = document.createElement('script');WePay.script.type = 'text/javascript';WePay.script.async = true;WePay.script.src = 'https://static.wepay.com/min/js/widgets.v2.js';var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(WePay.script, s);} else if (WePay.load_widgets) {WePay.load_widgets();}</script>
+    <a class="wepay-widget-button wepay-green" id="wepay_widget_anchor_50954f3fa5f6a" href="https://www.wepay.com/donations/890705390">View Progress</a><script type="text/javascript">var WePay = WePay || {};WePay.load_widgets = WePay.load_widgets || function() { };WePay.widgets = WePay.widgets || [];WePay.widgets.push( {object_id: 890705390,widget_type: "donation_campaign_progress",anchor_id: "wepay_widget_anchor_50954f3fa5f6a",widget_options: {no_dialog: "true",total_collected: "true",button_text: "View Progress", }});if (!WePay.script) {WePay.script = document.createElement('script');WePay.script.type = 'text/javascript';WePay.script.async = true;WePay.script.src = 'https://static.wepay.com/min/js/widgets.v2.js';var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(WePay.script, s);} else if (WePay.load_widgets) {WePay.load_widgets();}</script>
   </div>
 
   <div class="makePayment">
