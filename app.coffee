@@ -3,6 +3,15 @@ http = require 'http'
 path = require 'path'
 less = require 'less-middleware'
 nunjucks = require 'nunjucks'
+#wepay = require('wepay').WEPAY
+
+
+#wepay_settings = {
+#    'client_id'     : '127580',
+#    'client_secret' : '6180c3de46',
+#    'access_token'  : 'a9ff4ce866893119097e0c29ee1f7886b3891e76b4599ab589c232b4f2f6ddcd', # used for oAuth2
+#}
+
 
 app = express()
 
@@ -11,13 +20,15 @@ app.configure ->
   env.express(app)
   app.use express.errorHandler()
 
-  app.use express.favicon __dirname + '/public/images/favicon.ico'
-  app.use express.static __dirname + '/public'
+
 
   app.use less
     src: path.join __dirname, 'public'
     once: true
     compress: true
+
+  app.use express.favicon __dirname + '/public/images/favicon.ico'
+  app.use express.static __dirname + '/public'
 
   app.use express.bodyParser()
   app.use express.methodOverride()
