@@ -4,7 +4,7 @@ path = require 'path'
 less = require 'less-middleware'
 nunjucks = require 'nunjucks'
 request = require 'request'
-Kinvey = require 'Kinvey'
+Kinvey = require 'kinvey'
 
 Kinvey.init
   appKey: 'kid_eeg1EyERV5'
