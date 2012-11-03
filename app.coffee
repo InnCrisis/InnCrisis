@@ -22,6 +22,9 @@ wepaySettings =
 
 app = express()
 
+serverURL = 'localhost:3000'
+if process.env.serverURL?
+  sevrerURL = process.env.serverURL
 app.configure ->
   env = new nunjucks.Environment(new nunjucks.FileSystemLoader('templates'))
   env.express(app)
@@ -65,7 +68,7 @@ app.get '/donate', (req, res)->
         short_description: 'Short description!'
         type: 'DONATION'
         mode: 'regular'
-        redirect_uri: 'http://'+(process.env.serverURL or 'localhost:3000') +'/thankyou'
+        redirect_uri: 'http://'+serverURL+'/thankyou'
       (err, response, body)->
         res.redirect JSON.parse(body).checkout_uri
 
