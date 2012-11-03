@@ -51,7 +51,7 @@ app.get '/getaroom', (req, res)->
   res.render 'getaroom.html'
 
 app.get '/donate', (req, res)->
-  if !req.query.amount?
+  if !req.query.amount?.length
     res.render 'donate.html'
   else
     request.get
@@ -67,7 +67,6 @@ app.get '/donate', (req, res)->
         mode: 'regular'
         redirect_uri: 'http://localhost:3000/thankyou'
       (err, response, body)->
-        console.log arguments
         res.redirect JSON.parse(body).checkout_uri
 
 app.get '/thankyou', (req, res)->
