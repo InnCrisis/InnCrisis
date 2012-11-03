@@ -45,25 +45,30 @@ app.configure ->
     res.render '404.html'
 
 app.get '/', (req, res)->
-  donations.fetch {},()->
-    console.log arguments
-  res.render 'index.html'
+  res.render 'index.html',
+
+app.get '/getaroom', (req, res)->
+  res.render 'getaroom.html'
 
 app.get '/donate', (req, res)->
-  request.get
-    uri: wepaySettings.baseUri+'checkout/create'
-    headers:
-      "User-Agent":"Nodejs"
-      Authorization: 'Bearer '+wepaySettings.accessToken
-    form:
-      account_id:wepaySettings.accountId
-      amount: req.query.amount
-      short_description: 'Short description!'
-      type: 'DONATION'
-      mode: 'regular'
-      redirect_uri: 'http://localhost:3000/thankyou'
-    (err, response, body)->
-      res.redirect JSON.parse(body).checkout_uri
+  if !req.query.amount?
+    res.render 'donate.html'
+  else
+    request.get
+      uri: wepaySettings.baseUri+'checkout/create'
+      headers:
+        "User-Agent":"Nodejs"
+        Authorization: 'Bearer '+wepaySettings.accessToken
+      form:
+        account_id:wepaySettings.accountId
+        amount: req.query.amount
+        short_description: 'Short description!'
+        type: 'DONATION'
+        mode: 'regular'
+        redirect_uri: 'http://localhost:3000/thankyou'
+      (err, response, body)->
+        console.log arguments
+        res.redirect JSON.parse(body).checkout_uri
 
 app.get '/thankyou', (req, res)->
   request.get
