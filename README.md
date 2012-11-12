@@ -1,6 +1,6 @@
 InnCrisis
 =========
 
-InnCrisis enables non-profits to inform donors on how their specific personal donations are creating concrete change in the world.
+InnCrisis enables non-profits to directly inform donors on how their specific donations are changing the world.
 
 See [the wiki](https://github.com/InnCrisis/InnCrisis/wiki) for more information.
