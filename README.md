@@ -1,4 +1,4 @@
-HotelSandy
-==========
+InnCrisis
+=========
 
-A system to allow people to donate money for Sandy relief
+InnCrisis enables non-profits to inform donors on how their specific personal donations are creating concrete change in the world.
