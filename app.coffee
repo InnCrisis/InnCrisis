@@ -5,6 +5,7 @@ less = require 'less-middleware'
 nunjucks = require 'nunjucks'
 request = require 'request'
 Kinvey = require 'kinvey'
+expressCoffee = require 'express-coffee'
 
 Kinvey.init
   appKey: 'kid_eeg1EyERV5'
@@ -32,7 +33,10 @@ app.configure ->
   env.express(app)
   app.use express.errorHandler()
 
-
+  app.use expressCoffee
+    path: __dirname + '/public',
+    live: !process.env.PRODUCTION,
+    uglify: process.env.PRODUCTION
 
   app.use less
     src: path.join __dirname, 'public'
@@ -49,59 +53,60 @@ app.configure ->
     res.status 404
     res.render '404.html'
 
-app.get '/', (req, res)->
-  res.render 'index.html',
+app.get '*', (req, res)->
+  res.sendfile __dirname + '/public/index.html'
 
-app.get '/getaroom', (req, res)->
-  res.render 'getaroom.html'
-
-app.get '/donate', (req, res)->
-  if !req.query.amount?.length
-    res.render 'donate.html'
-  else
-    request.get
-      uri: wepaySettings.baseUri+'checkout/create'
-      headers:
-        "User-Agent":"Nodejs"
-        Authorization: 'Bearer '+wepaySettings.accessToken
-      form:
-        account_id:wepaySettings.accountId
-        amount: req.query.amount
-        short_description: 'Short description!'
-        type: 'DONATION'
-        mode: 'regular'
-        redirect_uri: 'http://'+serverURL+'/thankyou'
-      (err, response, body)->
-        res.redirect JSON.parse(body).checkout_uri
-
-app.get '/thankyou', (req, res)->
-  request.get
-    uri: wepaySettings.baseUri+'checkout'
-    headers:
-      "User-Agent":"Nodejs"
-      Authorization: 'Bearer '+wepaySettings.accessToken
-    form:
-      checkout_id:req.query.checkout_id
-    (err, response, body)->
-      donation = JSON.parse(body)
-      donationId = donation.checkout_id
-      delete donation.checkout_id
-
-      kDonation = new Kinvey.Entity(donation,'donations')
-      kDonation.setId(donationId)
-      kDonation.save()
-      res.render 'thankyou.html',
-        checkout_id: donationId
-
-
-app.get '/track', (req, res)->
-  donation = new Kinvey.Entity({}, 'donations');
-  donation.load req.query.checkout_id,
-    success: (response)->
-      res.render 'track.html',
-        donation: JSON.stringify(response,0,2)
-    error: ()->
-      res.render '500.html'
+#
+#app.get '/getaroom', (req, res)->
+#  res.render 'getaroom.html'
+#
+#app.get '/donate', (req, res)->
+#  if !req.query.amount?.length
+#    res.render 'donate.html'
+#  else
+#    request.get
+#      uri: wepaySettings.baseUri+'checkout/create'
+#      headers:
+#        "User-Agent":"Nodejs"
+#        Authorization: 'Bearer '+wepaySettings.accessToken
+#      form:
+#        account_id:wepaySettings.accountId
+#        amount: req.query.amount
+#        short_description: 'Short description!'
+#        type: 'DONATION'
+#        mode: 'regular'
+#        redirect_uri: 'http://'+serverURL+'/thankyou'
+#      (err, response, body)->
+#        res.redirect JSON.parse(body).checkout_uri
+#
+#app.get '/thankyou', (req, res)->
+#  request.get
+#    uri: wepaySettings.baseUri+'checkout'
+#    headers:
+#      "User-Agent":"Nodejs"
+#      Authorization: 'Bearer '+wepaySettings.accessToken
+#    form:
+#      checkout_id:req.query.checkout_id
+#    (err, response, body)->
+#      donation = JSON.parse(body)
+#      donationId = donation.checkout_id
+#      delete donation.checkout_id
+#
+#      kDonation = new Kinvey.Entity(donation,'donations')
+#      kDonation.setId(donationId)
+#      kDonation.save()
+#      res.render 'thankyou.html',
+#        checkout_id: donationId
+#
+#
+#app.get '/track', (req, res)->
+#  donation = new Kinvey.Entity({}, 'donations');
+#  donation.load req.query.checkout_id,
+#    success: (response)->
+#      res.render 'track.html',
+#        donation: JSON.stringify(response,0,2)
+#    error: ()->
+#      res.render '500.html'
 
 
 app.use (err, req, res, next)->

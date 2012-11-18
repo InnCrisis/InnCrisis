@@ -1,21 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="innCrisis">
   <head>
     <meta charset="utf-8"/>
-    
     <title>Inn Crisis</title>
     <meta name="description" content="Getting donations to those who need temporary housing." />
-
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="/javascripts/kinvey-js-0.9.10.min.js"></script>
     <script src="/javascripts/app.js"></script>
     <link type="text/css" rel="stylesheet" href="/styles/styles.css">
   </head>
   <body>
-    <div id="header">
-      <h1>Inn Crisis</h1>
+    <header>
+      <h1><a href="/">Inn Crisis</a></h1>
       <p id="description">Getting donations to those who need temporary housing.</p>
-    </div>
-    {% block content %}{% endblock %}
+    </header>
+    <div ng-view></div>
   </body>
 </html>
