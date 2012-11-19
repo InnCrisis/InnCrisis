@@ -22,11 +22,13 @@
     return $scope.donate = function() {
       var query, wepay;
       query = new Kinvey.Query();
-      query.on('amount').equal(20);
-      wepay = new Kinvey.Collection('WePay');
+      query.on('amount').equal($scope.donationAmount);
+      wepay = new Kinvey.Collection('WePay', {
+        query: query
+      });
       return wepay.fetch({
-        success: function() {
-          return console.log(arguments);
+        success: function(response) {
+          return window.location.href = response[0].get('checkout_uri');
         },
         error: function(error) {
           console.log('ERROR');

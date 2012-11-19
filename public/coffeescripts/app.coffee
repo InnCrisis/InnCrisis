@@ -19,15 +19,14 @@ angular.module('innCrisis', [])
 DonateCtrl = ($scope)->
   $scope.donate = ()->
     query = new Kinvey.Query()
-    query.on('amount').equal(20)
+    query.on('amount').equal( $scope.donationAmount )
 
-    wepay = new Kinvey.Collection 'WePay'
-#      query: query
-#
+    wepay = new Kinvey.Collection 'WePay',
+      query: query
 
     wepay.fetch
-      success: ()->
-        console.log arguments
+      success: (response)->
+        window.location.href = response[0].get('checkout_uri')
       error: (error)->
         console.log 'ERROR'
         console.log error
