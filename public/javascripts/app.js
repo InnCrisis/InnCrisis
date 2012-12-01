@@ -1,5 +1,5 @@
 (function() {
-  var DonateCtrl, LoginCtrl, RegisterCtrl, ThankYouCtrl;
+  var AdminHome, DonateCtrl, LoginCtrl, RegisterCtrl, ThankYouCtrl;
 
   Kinvey.init({
     appKey: 'kid_eeg1EyERV5',
@@ -9,19 +9,24 @@
   angular.module('innCrisis', []).config(function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true).hashPrefix('!');
     return $routeProvider.when('/', {
-      templateUrl: 'templates/landing.html'
+      templateUrl: 'partials/landing.html'
     }).when('/donate', {
-      templateUrl: 'templates/donate.html',
+      templateUrl: 'partials/donate.html',
       controller: DonateCtrl
     }).when('/thankyou', {
-      templateUrl: 'templates/thankyou.html',
+      templateUrl: 'partials/thankyou.html',
       controller: ThankYouCtrl
-    }).when('/admin', {
-      templateUrl: 'templates/login.html',
-      controller: LoginCtrl
-    }).when('/register', {
-      templateUrl: 'templates/register.html',
-      controller: RegisterCtrl
+    }).when('/admin/home', {
+      templateUrl: 'partials/admin/home.html',
+      controller: AdminHome
+    }).when('/admin/login', {
+      templateUrl: 'partials/admin/login.html',
+      controller: LoginCtrl,
+      adminWhitelist: true
+    }).when('/admin/register', {
+      templateUrl: 'partials/admin/register.html',
+      controller: RegisterCtrl,
+      adminWhitelist: true
     }).otherwise({
       redirectTo: '/'
     });
@@ -33,6 +38,11 @@
         return '';
       }
     };
+  }).run(function($rootScope, $location) {
+    return $rootScope.$on('$routeChangeStart', function(evt, next, current) {
+      console.log($location.path());
+      return $location.path('/admin/login');
+    });
   });
 
   DonateCtrl = function($scope) {
@@ -78,7 +88,10 @@
     });
   };
 
-  LoginCtrl = function($scope) {
+  LoginCtrl = function($scope, $location) {
+    $scope.register = function() {
+      return $location.path('/admin/register');
+    };
     return $scope.login = function() {
       var user;
       user = new Kinvey.User();
@@ -93,7 +106,10 @@
     };
   };
 
-  RegisterCtrl = function($scope) {
+  RegisterCtrl = function($scope, $location) {
+    $scope.signIn = function() {
+      return $location.path('/admin/login');
+    };
     return $scope.register = function() {
       return new Kinvey.User.create({
         username: $scope.email,
@@ -108,6 +124,10 @@
         }
       });
     };
+  };
+
+  AdminHome = function($scope) {
+    return console.log('Yay Admin Home!');
   };
 
 }).call(this);

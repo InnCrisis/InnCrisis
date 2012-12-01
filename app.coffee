@@ -49,70 +49,18 @@ app.configure ->
   app.use express.bodyParser()
   app.use express.methodOverride()
   app.use app.router
-  app.use (req, res)->
-    res.status 404
-    res.render '404.html'
 
 app.get '*', (req, res)->
-  res.sendfile __dirname + '/public/index.html'
-
-#
-#app.get '/getaroom', (req, res)->
-#  res.render 'getaroom.html'
-#
-#app.get '/donate', (req, res)->
-#  if !req.query.amount?.length
-#    res.render 'donate.html'
-#  else
-#    request.get
-#      uri: wepaySettings.baseUri+'checkout/create'
-#      headers:
-#        "User-Agent":"Nodejs"
-#        Authorization: 'Bearer '+wepaySettings.accessToken
-#      form:
-#        account_id:wepaySettings.accountId
-#        amount: req.query.amount
-#        short_description: 'Short description!'
-#        type: 'DONATION'
-#        mode: 'regular'
-#        redirect_uri: 'http://'+serverURL+'/thankyou'
-#      (err, response, body)->
-#        res.redirect JSON.parse(body).checkout_uri
-#
-#app.get '/thankyou', (req, res)->
-#  request.get
-#    uri: wepaySettings.baseUri+'checkout'
-#    headers:
-#      "User-Agent":"Nodejs"
-#      Authorization: 'Bearer '+wepaySettings.accessToken
-#    form:
-#      checkout_id:req.query.checkout_id
-#    (err, response, body)->
-#      donation = JSON.parse(body)
-#      donationId = donation.checkout_id
-#      delete donation.checkout_id
-#
-#      kDonation = new Kinvey.Entity(donation,'donations')
-#      kDonation.setId(donationId)
-#      kDonation.save()
-#      res.render 'thankyou.html',
-#        checkout_id: donationId
-#
-#
-#app.get '/track', (req, res)->
-#  donation = new Kinvey.Entity({}, 'donations');
-#  donation.load req.query.checkout_id,
-#    success: (response)->
-#      res.render 'track.html',
-#        donation: JSON.stringify(response,0,2)
-#    error: ()->
-#      res.render '500.html'
-
+  res.render 'standard.html'
 
 app.use (err, req, res, next)->
   throw err
   res.status 500
   res.render '500.html'
+
+app.use (req, res)->
+  res.status 404
+  res.render '404.html'
 
 http.createServer(app).listen process.env.PORT or 3000
 

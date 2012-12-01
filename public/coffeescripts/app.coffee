@@ -18,13 +18,19 @@ angular.module('innCrisis', [])
         templateUrl: 'partials/thankyou.html'
         controller: ThankYouCtrl
 
-      .when '/admin',
-        templateUrl: 'partials/login.html'
-        controller: LoginCtrl
+      .when '/admin/home',
+        templateUrl: 'partials/admin/home.html'
+        controller: AdminHome
 
-      .when '/register',
-        templateUrl: 'partials/register.html'
+      .when '/admin/login',
+        templateUrl: 'partials/admin/login.html'
+        controller: LoginCtrl
+        adminWhitelist: true
+
+      .when '/admin/register',
+        templateUrl: 'partials/admin/register.html'
         controller: RegisterCtrl
+        adminWhitelist: true
 
       .otherwise
         redirectTo: '/'
@@ -35,6 +41,26 @@ angular.module('innCrisis', [])
         moment.unix(dateString).format(format)
       else
         ''
+  .run ($rootScope, $location)->
+    $rootScope.$on '$routeChangeStart', (evt, next, current)->
+      currentPath = $location.path()
+      console.log currentPath
+
+      if $location.path().indexOf('/admin') == 0
+        user =  Kinvey.getCurrentUser()
+        if user
+          user.logout()
+        user = Kinvey.getCurrentUser()
+
+        console.log next.$route
+
+        if user == null and !next.$route?
+          $location.path '/admin/login'
+        else if user == null
+          console.log next.$route
+          $location.path '/admin/login'
+
+
 
 DonateCtrl = ($scope)->
   $scope.donate = ()->
@@ -72,7 +98,19 @@ ThankYouCtrl = ($scope)->
       console.log 'ERROR'
       console.log error
 
-LoginCtrl = ($scope)->
+
+
+
+############################################
+##
+## ADMIN Section
+##
+############################################
+
+LoginCtrl = ($scope, $location)->
+  $scope.register = ()->
+    $location.path '/admin/register'
+
   $scope.login = ()->
     user = new Kinvey.User()
     user.login $scope.email, $scope.password,
@@ -81,7 +119,10 @@ LoginCtrl = ($scope)->
       error: (err)->
         $scope.error = err.description
 
-RegisterCtrl = ($scope)->
+RegisterCtrl = ($scope, $location)->
+  $scope.signIn = ()->
+    $location.path '/admin/login'
+
   $scope.register = ()->
     new Kinvey.User.create
       username: $scope.email
@@ -92,3 +133,6 @@ RegisterCtrl = ($scope)->
         console.log user
       error: (err)->
         $scope.registerError = err.description
+
+AdminHome = ($scope)->
+  console.log 'Yay Admin Home!'

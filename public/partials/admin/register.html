@@ -1,0 +1,27 @@
+<form class="form-horizontal" ng-submit="login()">
+  <div class="error">{{error}}</div>
+  <div class="control-group">
+    <label class="control-label" for="name">Name</label>
+    <div class="controls">
+      <input type="text" id="name" placeholder="Sam Smith">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="email">Email</label>
+    <div class="controls">
+      <input type="email" id="email" placeholder="yourEmail@gmail.com">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="inputPassword">Password</label>
+    <div class="controls">
+      <input type="password" id="inputPassword" placeholder="Password">
+    </div>
+  </div>
+  <div class="control-group">
+    <div class="controls">
+      <button type="submit" class="btn btn-primary">Register</button>
+      <button type="button" class="btn" ng-click="signin()">Sign In</button>
+    </div>
+  </div>
+</form>
