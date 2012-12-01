@@ -36,6 +36,22 @@ angular.module('innCrisis', [])
         controller: RegisterCtrl
         bypassLogin: true
 
+      .when '/admin/disburse',
+        templateUrl: '/partials/admin/disburse.html'
+        controller: DisburseCtrl
+
+      .when '/admin/post-disburse/:disburseId',
+        templateUrl: '/partials/admin/post-disburse.html'
+        controller: PostDisburseCtrl
+
+      .when '/admin/management',
+        templateUrl: '/partials/admin/management.html'
+        controller: ManagementCtrl
+
+      .when '/admin/manage-disbursals'
+        templateUrl: '/partials/admin/manage-disbursals.html'
+        controller: ManageDisbursalsCtrl
+
       .otherwise
         templateUrl: '/partials/404.html'
 
@@ -137,9 +153,95 @@ RegisterCtrl = ($scope, $location)->
 
 HomeCtrl = ($scope)->
   $scope.user = Kinvey.getCurrentUser()
-  console.log $scope.user
 
 LogoutCtrl = ($scope, $location)->
   user = Kinvey.getCurrentUser()
-  user.logout()
+  if user
+    user.logout()
   $location.path '/admin/login'
+
+DisburseCtrl = ($scope, $location)->
+  user = Kinvey.getCurrentUser()
+  $scope.disburse = ()->
+    disbursement = new Kinvey.Entity
+      firstName: $scope.firstName
+      lastName: $scope.lastName
+      amount: $scope.amount
+    , 'disbursements'
+    disbursement.save
+      success: (disbursement)->
+        window.location.href =  '/admin/post-disburse/'+disbursement.get('_id')
+      error: (e)->
+        $scope.err = e.message
+        $scope.$digest()
+
+PostDisburseCtrl = ($scope, $location, $routeParams)->
+  disbursements = new Kinvey.Entity {}, 'disbursements'
+  disbursements.load $routeParams.disburseId,
+    success: (disbursement)->
+      $scope.disbursement = disbursement
+      $scope.$digest()
+    error: (e)->
+      $scope.err = e.message
+      $scope.$digest()
+
+
+ManagementCtrl = ($scope)->
+  updateUserList = ()->
+    users = new Kinvey.Collection('user')
+    users.fetch
+      resolve: ['role'],
+      success: (list)->
+        $scope.users = list
+        $scope.$digest()
+      error: (e)->
+        $scope.err = e.message
+        $scope.$digest()
+  updateUserList()
+
+  $scope.setAccess = (user, role, enabled)->
+    roles = new Kinvey.Entity {}, 'roles'
+    roles.load role,
+      success: (role)->
+        if enabled
+          user.set('role', role)
+        else
+          user.set('role', null)
+
+        user.save
+          success: (response)->
+            updateUserList()
+
+          error: (e)->
+            $scope.err = e.message
+
+      error: (e)->
+        $scope.err = e.message
+
+  $scope.hasAccess = (user, type)->
+    role = user.get('role')
+    if role?
+      role.get('_id') == type
+    else
+      false
+
+  $scope.destroy = (user)->
+    if confirm('Are you sure you want to destroy this user? You can\'t undo this.')
+      user.destroy
+        success: ()->
+          updateUserList()
+        error: (e)->
+          $scope.err = e.message
+
+ManageDisbursalsCtrl = ($scope)->
+  updateDisbursals = ()->
+    users = new Kinvey.Collection('disbursements')
+    users.fetch
+      resolve: ['role'],
+      success: (list)->
+        $scope.disbursements = list
+        $scope.$digest()
+      error: (e)->
+        $scope.err = e.message
+        $scope.$digest()
+  updateDisbursals()

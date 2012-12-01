@@ -1,5 +1,5 @@
 (function() {
-  var DonateCtrl, HomeCtrl, LoginCtrl, LogoutCtrl, RegisterCtrl, ThankYouCtrl;
+  var DisburseCtrl, DonateCtrl, HomeCtrl, LoginCtrl, LogoutCtrl, ManageDisbursalsCtrl, ManagementCtrl, PostDisburseCtrl, RegisterCtrl, ThankYouCtrl;
 
   Kinvey.init({
     appKey: 'kid_eeg1EyERV5',
@@ -30,6 +30,18 @@
       templateUrl: '/partials/admin/register.html',
       controller: RegisterCtrl,
       bypassLogin: true
+    }).when('/admin/disburse', {
+      templateUrl: '/partials/admin/disburse.html',
+      controller: DisburseCtrl
+    }).when('/admin/post-disburse/:disburseId', {
+      templateUrl: '/partials/admin/post-disburse.html',
+      controller: PostDisburseCtrl
+    }).when('/admin/management', {
+      templateUrl: '/partials/admin/management.html',
+      controller: ManagementCtrl
+    }).when('/admin/manage-disbursals', {
+      templateUrl: '/partials/admin/manage-disbursals.html',
+      controller: ManageDisbursalsCtrl
     }).otherwise({
       templateUrl: '/partials/404.html'
     });
@@ -144,15 +156,136 @@
   };
 
   HomeCtrl = function($scope) {
-    $scope.user = Kinvey.getCurrentUser();
-    return console.log($scope.user);
+    return $scope.user = Kinvey.getCurrentUser();
   };
 
   LogoutCtrl = function($scope, $location) {
     var user;
     user = Kinvey.getCurrentUser();
-    user.logout();
+    if (user) user.logout();
     return $location.path('/admin/login');
+  };
+
+  DisburseCtrl = function($scope, $location) {
+    var user;
+    user = Kinvey.getCurrentUser();
+    return $scope.disburse = function() {
+      var disbursement;
+      disbursement = new Kinvey.Entity({
+        firstName: $scope.firstName,
+        lastName: $scope.lastName,
+        amount: $scope.amount
+      }, 'disbursements');
+      return disbursement.save({
+        success: function(disbursement) {
+          return window.location.href = '/admin/post-disburse/' + disbursement.get('_id');
+        },
+        error: function(e) {
+          $scope.err = e.message;
+          return $scope.$digest();
+        }
+      });
+    };
+  };
+
+  PostDisburseCtrl = function($scope, $location, $routeParams) {
+    var disbursements;
+    disbursements = new Kinvey.Entity({}, 'disbursements');
+    return disbursements.load($routeParams.disburseId, {
+      success: function(disbursement) {
+        $scope.disbursement = disbursement;
+        return $scope.$digest();
+      },
+      error: function(e) {
+        $scope.err = e.message;
+        return $scope.$digest();
+      }
+    });
+  };
+
+  ManagementCtrl = function($scope) {
+    var updateUserList;
+    updateUserList = function() {
+      var users;
+      users = new Kinvey.Collection('user');
+      return users.fetch({
+        resolve: ['role'],
+        success: function(list) {
+          $scope.users = list;
+          return $scope.$digest();
+        },
+        error: function(e) {
+          $scope.err = e.message;
+          return $scope.$digest();
+        }
+      });
+    };
+    updateUserList();
+    $scope.setAccess = function(user, role, enabled) {
+      var roles;
+      roles = new Kinvey.Entity({}, 'roles');
+      return roles.load(role, {
+        success: function(role) {
+          if (enabled) {
+            user.set('role', role);
+          } else {
+            user.set('role', null);
+          }
+          return user.save({
+            success: function(response) {
+              return updateUserList();
+            },
+            error: function(e) {
+              return $scope.err = e.message;
+            }
+          });
+        },
+        error: function(e) {
+          return $scope.err = e.message;
+        }
+      });
+    };
+    $scope.hasAccess = function(user, type) {
+      var role;
+      role = user.get('role');
+      if (role != null) {
+        return role.get('_id') === type;
+      } else {
+        return false;
+      }
+    };
+    return $scope.destroy = function(user) {
+      if (confirm('Are you sure you want to destroy this user? You can\'t undo this.')) {
+        return user.destroy({
+          success: function() {
+            return updateUserList();
+          },
+          error: function(e) {
+            return $scope.err = e.message;
+          }
+        });
+      }
+    };
+  };
+
+  ManageDisbursalsCtrl = function($scope) {
+    var updateDisbursals;
+    updateDisbursals = function() {
+      var users;
+      users = new Kinvey.Collection('disbursements');
+      return users.fetch({
+        resolve: ['role'],
+        success: function(list) {
+          $scope.disbursements = list;
+          return $scope.$digest();
+        },
+        error: function(e) {
+          $scope.err = e.message;
+          return $scope.$digest();
+        }
+      });
+    };
+    return updateDisbursals();
   };
 
 }).call(this);

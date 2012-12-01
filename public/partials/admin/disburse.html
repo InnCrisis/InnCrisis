@@ -1,0 +1,26 @@
+<h1>Disburse Money</h1>
+<form class="form-horizontal" ng-submit="disburse()">
+  <div class="control-group">
+    <label class="control-label" for="firstName">First Name</label>
+    <div class="controls">
+      <input type="text" id="firstName" placeholder="Bobby" ng-model="firstName">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="lastName">Last Name</label>
+    <div class="controls">
+      <input type="text" id="lastName" placeholder="Wilde" ng-model="lastName">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="amount">Amount</label>
+    <div class="controls">
+      <input type="text" id="amount" placeholder="20.00" ng-model="amount">
+    </div>
+  </div>
+  <div class="control-group">
+    <div class="controls">
+      <input class="btn" type="submit" value="Disburse" />
+    </div>
+  </div>
+</form>

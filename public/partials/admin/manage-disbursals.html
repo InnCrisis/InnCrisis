@@ -1,0 +1,9 @@
+<h1>Manage Disbursals</h1>
+<div class="error" ng-hide="err.length == 0">{{err}}</div>
+<table>
+  <tr ng-repeat="disbursal in disbursements">
+    <td>{{disbursal.get('firstName')}}</td>
+    <td>{{disbursal.get('lastName')}}</td>
+    <td>{{disbursal.get('amount')}}</td>
+  </tr>
+</table>

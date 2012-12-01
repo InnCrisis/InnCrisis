@@ -1,0 +1,25 @@
+<h1>Management</h1>
+<div class="error">{{err}}</div>
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Email</th>
+    <th>User</th>
+    <th>Admin</th>
+  </tr>
+  <tr ng-repeat="user in users">
+    <td>{{ user.get('name') }}</td>
+    <td>{{ user.get('username') }}</td>
+    <td>
+      <div class="btn" ng-click="setAccess(user, 'user', true)" ng-hide="hasAccess(user,'user')">Make User</div>
+      <div class="btn" ng-click="setAccess(user, 'user', false)" ng-hide="!hasAccess(user, 'user')">Remove User</div>
+    </td>
+    <td>
+      <div class="btn" ng-click="setAccess(user, 'admin', true)" ng-hide="hasAccess(user,'admin')">Make Admin</div>
+      <div class="btn" ng-click="setAccess(user, 'admin', false)" ng-hide="!hasAccess(user, 'admin')">Remove Admin</div>
+    </td>
+    <!--<td>-->
+      <!--<div class="btn" ng-click="destroy(user)">Destroy User</div>-->
+    <!--</td>-->
+  </tr>
+</table>
