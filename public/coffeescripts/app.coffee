@@ -128,4 +128,5 @@ RegisterCtrl = ($scope, $location)->
         $scope.registerError = err.description
 
 AdminHome = ($scope)->
-  console.log 'Yay Admin Home!'
+  $scope.user = Kinvey.getCurrentUser()
+  console.log $scope.user

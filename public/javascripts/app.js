@@ -135,7 +135,8 @@
   };
 
   AdminHome = function($scope) {
-    return console.log('Yay Admin Home!');
+    $scope.user = Kinvey.getCurrentUser();
+    return console.log($scope.user);
   };
 
 }).call(this);
