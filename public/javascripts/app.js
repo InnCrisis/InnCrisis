@@ -42,7 +42,12 @@
     return $rootScope.$on('$routeChangeStart', function(evt, next, current) {
       var currentPath, user, _ref;
       currentPath = $location.path();
-      if (currentPath.indexOf('/admin') === 0) {
+      if (currentPath === '/admin/logout') {
+        user = Kinvey.getCurrentUser();
+        return user.logout(function() {
+          return $location.path('/admin/login');
+        });
+      } else if (currentPath.indexOf('/admin') === 0) {
         user = Kinvey.getCurrentUser();
         if (!(user != null) && !(((_ref = next.$route) != null ? _ref.bypassLogin : void 0) != null)) {
           return $location.path('/admin/login');

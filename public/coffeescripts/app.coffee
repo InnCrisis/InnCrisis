@@ -44,8 +44,12 @@ angular.module('innCrisis', [])
   .run ($rootScope, $location)->
     $rootScope.$on '$routeChangeStart', (evt, next, current)->
       currentPath = $location.path()
+      if currentPath == '/admin/logout'
+        user = Kinvey.getCurrentUser()
+        user.logout ()->
+          $location.path '/admin/login'
 
-      if currentPath.indexOf('/admin') == 0
+      else if currentPath.indexOf('/admin') == 0
         user = Kinvey.getCurrentUser()
 
         if !user? and !next.$route?.bypassLogin?
