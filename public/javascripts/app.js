@@ -1,5 +1,5 @@
 (function() {
-  var AdminHome, DonateCtrl, LoginCtrl, RegisterCtrl, ThankYouCtrl;
+  var DonateCtrl, HomeCtrl, LoginCtrl, LogoutCtrl, RegisterCtrl, ThankYouCtrl;
 
   Kinvey.init({
     appKey: 'kid_eeg1EyERV5',
@@ -18,11 +18,14 @@
       controller: ThankYouCtrl
     }).when('/admin/home', {
       templateUrl: '/partials/admin/home.html',
-      controller: AdminHome
+      controller: HomeCtrl
     }).when('/admin/login', {
       templateUrl: '/partials/admin/login.html',
       controller: LoginCtrl,
       bypassLogin: true
+    }).when('/admin/logout', {
+      templateUrl: '/partials/admin/logout.html',
+      controller: LogoutCtrl
     }).when('/admin/register', {
       templateUrl: '/partials/admin/register.html',
       controller: RegisterCtrl,
@@ -42,16 +45,11 @@
     return $rootScope.$on('$routeChangeStart', function(evt, next, current) {
       var currentPath, user, _ref;
       currentPath = $location.path();
-      if (currentPath === '/admin/logout') {
-        user = Kinvey.getCurrentUser();
-        return user.logout(function() {
-          return $location.path('/admin/login');
-        });
-      } else if (currentPath.indexOf('/admin') === 0) {
+      if (currentPath.indexOf('/admin') === 0) {
         user = Kinvey.getCurrentUser();
         if (!(user != null) && !(((_ref = next.$route) != null ? _ref.bypassLogin : void 0) != null)) {
           return $location.path('/admin/login');
-        } else if ((user != null) && !(next.route != null)) {
+        } else if ((user != null) && !(next.$route != null)) {
           return $location.path('/admin/home');
         }
       }
@@ -113,7 +111,8 @@
           return $location.path('/admin/home');
         },
         error: function(err) {
-          return $scope.error = err.description;
+          $scope.error = err.description;
+          return $scope.$digest();
         }
       });
     };
@@ -124,24 +123,36 @@
       return $location.path('/admin/login');
     };
     return $scope.register = function() {
-      return new Kinvey.User.create({
-        username: $scope.email,
-        password: $scope.password,
-        name: $scope.name
-      }, {
-        success: function(user) {
-          return $location.path('/admin/home');
-        },
-        error: function(err) {
-          return $scope.registerError = err.description;
-        }
-      });
+      if (!($scope.email.length && $scope.password.length && $scope.name)) {
+        return $scope.error = 'All form fields are required';
+      } else {
+        return new Kinvey.User.create({
+          username: $scope.email,
+          password: $scope.password,
+          name: $scope.name
+        }, {
+          success: function(user) {
+            return $location.path('/admin/home');
+          },
+          error: function(err) {
+            $scope.error = err.description;
+            return $scope.$digest();
+          }
+        });
+      }
     };
   };
 
-  AdminHome = function($scope) {
+  HomeCtrl = function($scope) {
     $scope.user = Kinvey.getCurrentUser();
     return console.log($scope.user);
+  };
+
+  LogoutCtrl = function($scope, $location) {
+    var user;
+    user = Kinvey.getCurrentUser();
+    user.logout();
+    return $location.path('/admin/login');
   };
 
 }).call(this);

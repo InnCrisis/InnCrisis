@@ -20,12 +20,16 @@ angular.module('innCrisis', [])
 
       .when '/admin/home',
         templateUrl: '/partials/admin/home.html'
-        controller: AdminHome
+        controller: HomeCtrl
 
       .when '/admin/login',
         templateUrl: '/partials/admin/login.html'
         controller: LoginCtrl
         bypassLogin: true
+
+      .when '/admin/logout',
+        templateUrl: '/partials/admin/logout.html'
+        controller: LogoutCtrl
 
       .when '/admin/register',
         templateUrl: '/partials/admin/register.html'
@@ -44,17 +48,12 @@ angular.module('innCrisis', [])
   .run ($rootScope, $location)->
     $rootScope.$on '$routeChangeStart', (evt, next, current)->
       currentPath = $location.path()
-      if currentPath == '/admin/logout'
-        user = Kinvey.getCurrentUser()
-        user.logout ()->
-          $location.path '/admin/login'
-
-      else if currentPath.indexOf('/admin') == 0
+      if currentPath.indexOf('/admin') == 0
         user = Kinvey.getCurrentUser()
 
         if !user? and !next.$route?.bypassLogin?
           $location.path('/admin/login')
-        else if user? and !next.route?
+        else if user? and !next.$route?
           $location.path('/admin/home')
 
 
@@ -115,22 +114,32 @@ LoginCtrl = ($scope, $location)->
         $location.path '/admin/home'
       error: (err)->
         $scope.error = err.description
+        $scope.$digest()
 
 RegisterCtrl = ($scope, $location)->
   $scope.signIn = ()->
     $location.path '/admin/login'
 
   $scope.register = ()->
-    new Kinvey.User.create
-      username: $scope.email
-      password: $scope.password
-      name: $scope.name
-    ,
-      success: (user)->
-        $location.path '/admin/home'
-      error: (err)->
-        $scope.registerError = err.description
+    unless $scope.email.length and $scope.password.length && $scope.name
+      $scope.error = 'All form fields are required'
+    else
+      new Kinvey.User.create
+        username: $scope.email
+        password: $scope.password
+        name: $scope.name
+      ,
+        success: (user)->
+          $location.path '/admin/home'
+        error: (err)->
+          $scope.error = err.description
+          $scope.$digest()
 
-AdminHome = ($scope)->
+HomeCtrl = ($scope)->
   $scope.user = Kinvey.getCurrentUser()
   console.log $scope.user
+
+LogoutCtrl = ($scope, $location)->
+  user = Kinvey.getCurrentUser()
+  user.logout()
+  $location.path '/admin/login'
