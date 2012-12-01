@@ -22,11 +22,17 @@
     }).when('/admin/login', {
       templateUrl: 'partials/admin/login.html',
       controller: LoginCtrl,
-      adminWhitelist: true
+      bypassLogin: true
     }).when('/admin/register', {
       templateUrl: 'partials/admin/register.html',
       controller: RegisterCtrl,
-      adminWhitelist: true
+      bypassLogin: true
+    }).when('/admin', {
+      templateUrl: 'partials/admin/login.html',
+      controller: LoginCtrl
+    }).when('/admin/*', {
+      templateUrl: 'partials/admin/login.html',
+      controller: LoginCtrl
     }).otherwise({
       redirectTo: '/'
     });
@@ -40,8 +46,18 @@
     };
   }).run(function($rootScope, $location) {
     return $rootScope.$on('$routeChangeStart', function(evt, next, current) {
-      console.log($location.path());
-      return $location.path('/admin/login');
+      var currentPath, user, _ref;
+      currentPath = $location.path();
+      if (currentPath.indexOf('/admin') === 0) {
+        user = Kinvey.getCurrentUser();
+        if (user) user.logout();
+        user = Kinvey.getCurrentUser();
+        if (user === null && !(((_ref = next.$route) != null ? _ref.bypassLogin : void 0) != null)) {
+          return console.log('redirect');
+        } else if (user === null) {
+          return console.log('Route bypassed');
+        }
+      }
     });
   });
 

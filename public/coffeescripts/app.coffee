@@ -25,12 +25,20 @@ angular.module('innCrisis', [])
       .when '/admin/login',
         templateUrl: 'partials/admin/login.html'
         controller: LoginCtrl
-        adminWhitelist: true
+        bypassLogin: true
 
       .when '/admin/register',
         templateUrl: 'partials/admin/register.html'
         controller: RegisterCtrl
-        adminWhitelist: true
+        bypassLogin: true
+
+      .when '/admin',
+        templateUrl: 'partials/admin/login.html'
+        controller: LoginCtrl
+
+      .when '/admin/*',
+        templateUrl: 'partials/admin/login.html'
+        controller: LoginCtrl
 
       .otherwise
         redirectTo: '/'
@@ -44,22 +52,18 @@ angular.module('innCrisis', [])
   .run ($rootScope, $location)->
     $rootScope.$on '$routeChangeStart', (evt, next, current)->
       currentPath = $location.path()
-      console.log currentPath
 
-      if $location.path().indexOf('/admin') == 0
+      if currentPath.indexOf('/admin') == 0
         user =  Kinvey.getCurrentUser()
         if user
           user.logout()
         user = Kinvey.getCurrentUser()
 
-        console.log next.$route
-
-        if user == null and !next.$route?
-          $location.path '/admin/login'
+        if user == null and !next.$route?.bypassLogin?
+          console.log 'redirect'
+#          $location.path('/admin/login')
         else if user == null
-          console.log next.$route
-          $location.path '/admin/login'
-
+          console.log 'Route bypassed'
 
 
 DonateCtrl = ($scope)->
