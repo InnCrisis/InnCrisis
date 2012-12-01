@@ -9,32 +9,26 @@
   angular.module('innCrisis', []).config(function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true).hashPrefix('!');
     return $routeProvider.when('/', {
-      templateUrl: 'partials/landing.html'
+      templateUrl: '/partials/landing.html'
     }).when('/donate', {
-      templateUrl: 'partials/donate.html',
+      templateUrl: '/partials/donate.html',
       controller: DonateCtrl
     }).when('/thankyou', {
-      templateUrl: 'partials/thankyou.html',
+      templateUrl: '/partials/thankyou.html',
       controller: ThankYouCtrl
     }).when('/admin/home', {
-      templateUrl: 'partials/admin/home.html',
+      templateUrl: '/partials/admin/home.html',
       controller: AdminHome
     }).when('/admin/login', {
-      templateUrl: 'partials/admin/login.html',
+      templateUrl: '/partials/admin/login.html',
       controller: LoginCtrl,
       bypassLogin: true
     }).when('/admin/register', {
-      templateUrl: 'partials/admin/register.html',
+      templateUrl: '/partials/admin/register.html',
       controller: RegisterCtrl,
       bypassLogin: true
-    }).when('/admin', {
-      templateUrl: 'partials/admin/login.html',
-      controller: LoginCtrl
-    }).when('/admin/*', {
-      templateUrl: 'partials/admin/login.html',
-      controller: LoginCtrl
     }).otherwise({
-      redirectTo: '/'
+      templateUrl: '/partials/404.html'
     });
   }).filter('moment', function() {
     return function(dateString, format) {
@@ -50,12 +44,10 @@
       currentPath = $location.path();
       if (currentPath.indexOf('/admin') === 0) {
         user = Kinvey.getCurrentUser();
-        if (user) user.logout();
-        user = Kinvey.getCurrentUser();
-        if (user === null && !(((_ref = next.$route) != null ? _ref.bypassLogin : void 0) != null)) {
-          return console.log('redirect');
-        } else if (user === null) {
-          return console.log('Route bypassed');
+        if (!(user != null) && !(((_ref = next.$route) != null ? _ref.bypassLogin : void 0) != null)) {
+          return $location.path('/admin/login');
+        } else if ((user != null) && !(next.route != null)) {
+          return $location.path('/admin/home');
         }
       }
     });
@@ -113,7 +105,7 @@
       user = new Kinvey.User();
       return user.login($scope.email, $scope.password, {
         success: function(user) {
-          return console.log(user);
+          return $location.path('/admin/home');
         },
         error: function(err) {
           return $scope.error = err.description;
@@ -133,7 +125,7 @@
         name: $scope.name
       }, {
         success: function(user) {
-          return console.log(user);
+          return $location.path('/admin/home');
         },
         error: function(err) {
           return $scope.registerError = err.description;

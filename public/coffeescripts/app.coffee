@@ -8,40 +8,32 @@ angular.module('innCrisis', [])
     $locationProvider.html5Mode(true).hashPrefix('!');
     $routeProvider
       .when '/',
-        templateUrl: 'partials/landing.html'
+        templateUrl: '/partials/landing.html'
 
       .when '/donate',
-        templateUrl: 'partials/donate.html'
+        templateUrl: '/partials/donate.html'
         controller: DonateCtrl
 
       .when '/thankyou',
-        templateUrl: 'partials/thankyou.html'
+        templateUrl: '/partials/thankyou.html'
         controller: ThankYouCtrl
 
       .when '/admin/home',
-        templateUrl: 'partials/admin/home.html'
+        templateUrl: '/partials/admin/home.html'
         controller: AdminHome
 
       .when '/admin/login',
-        templateUrl: 'partials/admin/login.html'
+        templateUrl: '/partials/admin/login.html'
         controller: LoginCtrl
         bypassLogin: true
 
       .when '/admin/register',
-        templateUrl: 'partials/admin/register.html'
+        templateUrl: '/partials/admin/register.html'
         controller: RegisterCtrl
         bypassLogin: true
 
-      .when '/admin',
-        templateUrl: 'partials/admin/login.html'
-        controller: LoginCtrl
-
-      .when '/admin/*',
-        templateUrl: 'partials/admin/login.html'
-        controller: LoginCtrl
-
       .otherwise
-        redirectTo: '/'
+        templateUrl: '/partials/404.html'
 
   .filter 'moment', ()->
     return (dateString, format)->
@@ -54,16 +46,13 @@ angular.module('innCrisis', [])
       currentPath = $location.path()
 
       if currentPath.indexOf('/admin') == 0
-        user =  Kinvey.getCurrentUser()
-        if user
-          user.logout()
         user = Kinvey.getCurrentUser()
 
-        if user == null and !next.$route?.bypassLogin?
-          console.log 'redirect'
-#          $location.path('/admin/login')
-        else if user == null
-          console.log 'Route bypassed'
+        if !user? and !next.$route?.bypassLogin?
+          $location.path('/admin/login')
+        else if user? and !next.route?
+          $location.path('/admin/home')
+
 
 
 DonateCtrl = ($scope)->
@@ -119,7 +108,7 @@ LoginCtrl = ($scope, $location)->
     user = new Kinvey.User()
     user.login $scope.email, $scope.password,
       success: (user)->
-        console.log user
+        $location.path '/admin/home'
       error: (err)->
         $scope.error = err.description
 
@@ -134,7 +123,7 @@ RegisterCtrl = ($scope, $location)->
       name: $scope.name
     ,
       success: (user)->
-        console.log user
+        $location.path '/admin/home'
       error: (err)->
         $scope.registerError = err.description
 
