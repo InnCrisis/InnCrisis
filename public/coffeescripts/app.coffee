@@ -44,9 +44,9 @@ angular.module('innCrisis', [])
         templateUrl: '/partials/admin/post-disburse.html'
         controller: PostDisburseCtrl
 
-      .when '/admin/management',
-        templateUrl: '/partials/admin/management.html'
-        controller: ManagementCtrl
+      .when '/admin/manage-users',
+        templateUrl: '/partials/admin/manage-users.html'
+        controller: UserManagementCtrl
 
       .when '/admin/manage-disbursals'
         templateUrl: '/partials/admin/manage-disbursals.html'
@@ -191,7 +191,7 @@ PostDisburseCtrl = ($scope, $location, $routeParams)->
       $scope.$digest()
 
 
-ManagementCtrl = ($scope)->
+UserManagementCtrl = ($scope)->
   updateUserList = ()->
     users = new Kinvey.Collection('user')
     users.fetch

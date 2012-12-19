@@ -1,5 +1,5 @@
 (function() {
-  var DisburseCtrl, DonateCtrl, DonationsCtrl, HomeCtrl, LoginCtrl, LogoutCtrl, ManageDisbursalsCtrl, ManagementCtrl, PostDisburseCtrl, RegisterCtrl, ThankYouCtrl;
+  var DisburseCtrl, DonateCtrl, DonationsCtrl, HomeCtrl, LoginCtrl, LogoutCtrl, ManageDisbursalsCtrl, PostDisburseCtrl, RegisterCtrl, ThankYouCtrl, UserManagementCtrl;
 
   Kinvey.init({
     appKey: 'kid_eeg1EyERV5',
@@ -36,9 +36,9 @@
     }).when('/admin/post-disburse/:disburseId', {
       templateUrl: '/partials/admin/post-disburse.html',
       controller: PostDisburseCtrl
-    }).when('/admin/management', {
-      templateUrl: '/partials/admin/management.html',
-      controller: ManagementCtrl
+    }).when('/admin/manage-users', {
+      templateUrl: '/partials/admin/manage-users.html',
+      controller: UserManagementCtrl
     }).when('/admin/manage-disbursals', {
       templateUrl: '/partials/admin/manage-disbursals.html',
       controller: ManageDisbursalsCtrl
@@ -207,7 +207,7 @@
     });
   };
 
-  ManagementCtrl = function($scope) {
+  UserManagementCtrl = function($scope) {
     var updateUserList;
     updateUserList = function() {
       var users;
