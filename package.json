@@ -1,6 +1,9 @@
 {
   "name": "HotelSandy",
   "version": "0.0.1",
+  "scripts": {
+    "start": "node index"
+  },
   "dependencies": {
     "express": "3.0.0rc4",
     "coffee-script": "1.3.x",

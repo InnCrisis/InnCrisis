@@ -52,6 +52,10 @@ angular.module('innCrisis', [])
         templateUrl: '/partials/admin/manage-disbursals.html'
         controller: ManageDisbursalsCtrl
 
+      .when '/admin/view-donations',
+        templateUrl: '/partials/admin/view-donations.html'
+        controller: DonationsCtrl
+
       .otherwise
         templateUrl: '/partials/404.html'
 
@@ -97,18 +101,19 @@ ThankYouCtrl = ($scope)->
   query = new Kinvey.Query()
   query.on('checkoutId').equal( checkoutId )
 
-  wepay = new Kinvey.Collection 'WePayDonations',
-    query: query
-
-  wepay.fetch
-    success: (response)->
+  donation = new Kinvey.Entity
+    _id: checkoutId
+    , 'donations'
+  donation.save
+    success: (savedDonation)->
       $scope.loading = false
-      $scope.donation = response[0].attr
+      $scope.donation = savedDonation.toJSON(true)
       $scope.$digest()
 
     error: (error)->
-      console.log 'ERROR'
-      console.log error
+      console.log 'Error Saving Donation', error
+      $scope.err = error.message
+      $scope.digest()
 
 
 
@@ -245,3 +250,15 @@ ManageDisbursalsCtrl = ($scope)->
         $scope.err = e.message
         $scope.$digest()
   updateDisbursals()
+
+DonationsCtrl = ($scope)->
+  updateDonations = ()->
+    donations = new Kinvey.Collection('donations');
+    donations.fetch
+      success: (list)->
+        $scope.donations = (entry.toJSON(true) for index, entry of list)
+        $scope.$digest()
+      error: (e)->
+        $scope.err = e.message
+        $scope.$digest()
+  updateDonations()

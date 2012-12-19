@@ -1,5 +1,5 @@
 (function() {
-  var DisburseCtrl, DonateCtrl, HomeCtrl, LoginCtrl, LogoutCtrl, ManageDisbursalsCtrl, ManagementCtrl, PostDisburseCtrl, RegisterCtrl, ThankYouCtrl;
+  var DisburseCtrl, DonateCtrl, DonationsCtrl, HomeCtrl, LoginCtrl, LogoutCtrl, ManageDisbursalsCtrl, ManagementCtrl, PostDisburseCtrl, RegisterCtrl, ThankYouCtrl;
 
   Kinvey.init({
     appKey: 'kid_eeg1EyERV5',
@@ -42,6 +42,9 @@
     }).when('/admin/manage-disbursals', {
       templateUrl: '/partials/admin/manage-disbursals.html',
       controller: ManageDisbursalsCtrl
+    }).when('/admin/view-donations', {
+      templateUrl: '/partials/admin/view-donations.html',
+      controller: DonationsCtrl
     }).otherwise({
       templateUrl: '/partials/404.html'
     });
@@ -90,23 +93,24 @@
   };
 
   ThankYouCtrl = function($scope) {
-    var checkoutId, query, wepay;
+    var checkoutId, donation, query;
     $scope.loading = true;
     checkoutId = window.location.search.replace('?checkout_id=', '');
     query = new Kinvey.Query();
     query.on('checkoutId').equal(checkoutId);
-    wepay = new Kinvey.Collection('WePayDonations', {
-      query: query
-    });
-    return wepay.fetch({
-      success: function(response) {
+    donation = new Kinvey.Entity({
+      _id: checkoutId
+    }, 'donations');
+    return donation.save({
+      success: function(savedDonation) {
         $scope.loading = false;
-        $scope.donation = response[0].attr;
+        $scope.donation = savedDonation.toJSON(true);
         return $scope.$digest();
       },
       error: function(error) {
-        console.log('ERROR');
-        return console.log(error);
+        console.log('Error Saving Donation', error);
+        $scope.err = error.message;
+        return $scope.digest();
       }
     });
   };
@@ -286,6 +290,34 @@
       });
     };
     return updateDisbursals();
+  };
+
+  DonationsCtrl = function($scope) {
+    var updateDonations;
+    updateDonations = function() {
+      var donations;
+      donations = new Kinvey.Collection('donations');
+      return donations.fetch({
+        success: function(list) {
+          var entry, index;
+          $scope.donations = (function() {
+            var _results;
+            _results = [];
+            for (index in list) {
+              entry = list[index];
+              _results.push(entry.toJSON(true));
+            }
+            return _results;
+          })();
+          return $scope.$digest();
+        },
+        error: function(e) {
+          $scope.err = e.message;
+          return $scope.$digest();
+        }
+      });
+    };
+    return updateDonations();
   };
 
 }).call(this);

@@ -1,0 +1,16 @@
+<h1>View Donations</h1>
+<div class="error" ng-hide="err.length == 0">{{err}}</div>
+<table class="table">
+  <thead>
+    <th>Name</th>
+    <th>Amount</th>
+    <th>Email</th>
+    <th>Matched</th>
+  </thead>
+  <tr ng-repeat="donation in donations">
+    <td>{{donation.wepay.payer_name}}</td>
+    <td>{{donation.wepay.amount | currency}}</td>
+    <td>{{donation.wepay.payer_email}}</td>
+    <td>{{donation.matched}}</td>
+  </tr>
+</table>
