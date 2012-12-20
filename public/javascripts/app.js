@@ -1,12 +1,12 @@
 (function() {
-  var DisburseCtrl, DonateCtrl, DonationsCtrl, HomeCtrl, LoginCtrl, LogoutCtrl, ManageDisbursalsCtrl, PostDisburseCtrl, RegisterCtrl, ThankYouCtrl, UserManagementCtrl;
+  var App, DisburseCtrl, DonateCtrl, DonationsCtrl, HomeCtrl, LoginCtrl, LogoutCtrl, ManageDisbursalsCtrl, PostDisburseCtrl, RegisterCtrl, ThankYouCtrl, UserManagementCtrl;
 
   Kinvey.init({
     appKey: 'kid_eeg1EyERV5',
     appSecret: '513acbb1a0154665853fb9f0f4f19fe7'
   });
 
-  angular.module('innCrisis', []).config(function($routeProvider, $locationProvider) {
+  App = angular.module('innCrisis', []).config(function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true).hashPrefix('!');
     return $routeProvider.when('/', {
       templateUrl: '/partials/landing.html'
@@ -41,10 +41,13 @@
       controller: UserManagementCtrl
     }).when('/admin/manage-disbursals', {
       templateUrl: '/partials/admin/manage-disbursals.html',
-      controller: ManageDisbursalsCtrl
+      controller: ManageDisbursalsCtrl,
+      resolve: ManageDisbursalsCtrl.resolve
     }).when('/admin/view-donations', {
       templateUrl: '/partials/admin/view-donations.html',
       controller: DonationsCtrl
+    }).when('/404', {
+      templateUrl: '/partials/404.html'
     }).otherwise({
       templateUrl: '/partials/404.html'
     });
@@ -57,7 +60,7 @@
       }
     };
   }).run(function($rootScope, $location) {
-    return $rootScope.$on('$routeChangeStart', function(evt, next, current) {
+    $rootScope.$on('$routeChangeStart', function(evt, next, current) {
       var currentPath, user, _ref;
       currentPath = $location.path();
       if (currentPath.indexOf('/admin') === 0) {
@@ -69,6 +72,27 @@
         }
       }
     });
+    $rootScope.$on('$routeChangeError', function() {
+      return $location.path('/404').replace();
+    });
+    return $rootScope.$safeApply = function($scope, fn) {
+      $scope = $scope || $rootScope;
+      fn = fn || function() {};
+      if ($scope.$$phase) {
+        return fn();
+      } else {
+        return $scope.$apply(fn);
+      }
+    };
+  }).service('$safeRedirect', function($rootScope, $location) {
+    return this.path = function(url, replace, reload) {
+      if (reload || $rootScope.$$phase) {
+        return window.location = url;
+      } else {
+        $location.path(url);
+        if (replace) return $location.replace();
+      }
+    };
   });
 
   DonateCtrl = function($scope) {
@@ -115,16 +139,16 @@
     });
   };
 
-  LoginCtrl = function($scope, $location) {
+  LoginCtrl = function($scope, $safeRedirect) {
     $scope.register = function() {
-      return $location.path('/admin/register');
+      return $safeRedirect.path('/admin/register');
     };
     return $scope.login = function() {
       var user;
       user = new Kinvey.User();
       return user.login($scope.email, $scope.password, {
         success: function(user) {
-          return $location.path('/admin/home');
+          return $safeRedirect.path('/admin/home');
         },
         error: function(err) {
           $scope.error = err.description;
@@ -272,24 +296,28 @@
     };
   };
 
-  ManageDisbursalsCtrl = function($scope) {
-    var updateDisbursals;
-    updateDisbursals = function() {
-      var users;
+  ManageDisbursalsCtrl = function($scope, disbursements) {
+    return $scope.disbursements = disbursements;
+  };
+
+  ManageDisbursalsCtrl.resolve = {
+    disbursements: function($q, $rootScope) {
+      var deferred, users;
+      deferred = $q.defer();
       users = new Kinvey.Collection('disbursements');
-      return users.fetch({
+      users.fetch({
         resolve: ['role'],
         success: function(list) {
-          $scope.disbursements = list;
-          return $scope.$digest();
+          return $rootScope.$safeApply(null, function() {
+            return deferred.resolve(list);
+          });
         },
         error: function(e) {
-          $scope.err = e.message;
-          return $scope.$digest();
+          return deferred.reject(e.message);
         }
       });
-    };
-    return updateDisbursals();
+      return deferred.promise;
+    }
   };
 
   DonationsCtrl = function($scope) {

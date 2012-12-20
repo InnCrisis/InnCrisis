@@ -3,7 +3,7 @@ Kinvey.init({
     appSecret: '513acbb1a0154665853fb9f0f4f19fe7'
 });
 
-angular.module('innCrisis', [])
+App = angular.module('innCrisis', [])
   .config ($routeProvider, $locationProvider)->
     $locationProvider.html5Mode(true).hashPrefix('!');
     $routeProvider
@@ -51,10 +51,14 @@ angular.module('innCrisis', [])
       .when '/admin/manage-disbursals'
         templateUrl: '/partials/admin/manage-disbursals.html'
         controller: ManageDisbursalsCtrl
+        resolve: ManageDisbursalsCtrl.resolve
 
       .when '/admin/view-donations',
         templateUrl: '/partials/admin/view-donations.html'
         controller: DonationsCtrl
+
+      .when '/404'
+        templateUrl: '/partials/404.html'
 
       .otherwise
         templateUrl: '/partials/404.html'
@@ -76,7 +80,28 @@ angular.module('innCrisis', [])
         else if user? and !next.$route?
           $location.path('/admin/home')
 
+    $rootScope.$on '$routeChangeError', ()->
+      $location.path('/404').replace()
 
+    $rootScope.$safeApply = ($scope, fn)->
+      $scope = $scope || $rootScope;
+      fn = fn || ()->;
+      if($scope.$$phase)
+        fn();
+      else
+        $scope.$apply(fn);
+
+
+
+  .service '$safeRedirect', ($rootScope, $location)->
+    @.path = (url, replace, reload)->
+      if(reload || $rootScope.$$phase)
+        window.location = url;
+      else
+        $location.path url
+        if replace
+          $location.replace()
+  #      $rootScope.apply()
 
 DonateCtrl = ($scope)->
   $scope.donate = ()->
@@ -124,15 +149,15 @@ ThankYouCtrl = ($scope)->
 ##
 ############################################
 
-LoginCtrl = ($scope, $location)->
+LoginCtrl = ($scope, $safeRedirect)->
   $scope.register = ()->
-    $location.path '/admin/register'
+    $safeRedirect.path '/admin/register'
 
   $scope.login = ()->
     user = new Kinvey.User()
     user.login $scope.email, $scope.password,
       success: (user)->
-        $location.path '/admin/home'
+        $safeRedirect.path '/admin/home'
       error: (err)->
         $scope.error = err.description
         $scope.$digest()
@@ -238,18 +263,21 @@ UserManagementCtrl = ($scope)->
         error: (e)->
           $scope.err = e.message
 
-ManageDisbursalsCtrl = ($scope)->
-  updateDisbursals = ()->
+ManageDisbursalsCtrl = ($scope, disbursements)->
+  $scope.disbursements = disbursements
+
+ManageDisbursalsCtrl.resolve =
+  disbursements: ($q, $rootScope)->
+    deferred = $q.defer()
     users = new Kinvey.Collection('disbursements')
     users.fetch
       resolve: ['role'],
       success: (list)->
-        $scope.disbursements = list
-        $scope.$digest()
+        $rootScope.$safeApply null, ()->
+          deferred.resolve(list)
       error: (e)->
-        $scope.err = e.message
-        $scope.$digest()
-  updateDisbursals()
+        deferred.reject(e.message)
+    return deferred.promise
 
 DonationsCtrl = ($scope)->
   updateDonations = ()->

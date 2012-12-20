@@ -40,7 +40,7 @@ app.configure ->
 
   app.use less
     src: path.join __dirname, 'public'
-    once: true
+    once: false
     compress: true
 
   app.use express.favicon __dirname + '/public/images/favicon.ico'
