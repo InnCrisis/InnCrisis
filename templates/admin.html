@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block scripts %}
+  <script src="/javascripts/admin.js"></script>
+{% endblock %}
+
+{% block content %}
+  <div ng-controller="NavigationCtrl">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <ul class="nav">
+          <li ng-repeat="route in routes" ng-class="{active: route.active}">
+            <a href="{{route.path}}">{{route.name}}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div ng-view>Loading...</div>
+  </div>
+{% endblock %}

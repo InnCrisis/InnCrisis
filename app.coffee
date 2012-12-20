@@ -29,7 +29,10 @@ if process.env.serverURL?
 
 
 app.configure ->
-  env = new nunjucks.Environment(new nunjucks.FileSystemLoader('templates'))
+  env = new nunjucks.Environment(new nunjucks.FileSystemLoader('templates'),{
+    variableStart: '<$'
+    variableEnd: '$>'
+  })
   env.express(app)
   app.use express.errorHandler()
 
@@ -49,6 +52,13 @@ app.configure ->
   app.use express.bodyParser()
   app.use express.methodOverride()
   app.use app.router
+
+
+app.get '/admin', (req, res)->
+  res.render 'admin.html'
+
+app.get '/admin/*', (req, res)->
+  res.render 'admin.html'
 
 app.get '*', (req, res)->
   res.render 'standard.html'

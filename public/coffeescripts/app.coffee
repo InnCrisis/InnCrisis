@@ -3,7 +3,7 @@ Kinvey.init({
     appSecret: '513acbb1a0154665853fb9f0f4f19fe7'
 });
 
-App = angular.module('innCrisis', [])
+window.App = App = angular.module('innCrisis', [])
   .config ($routeProvider, $locationProvider)->
     $locationProvider.html5Mode(true).hashPrefix('!');
     $routeProvider
@@ -18,50 +18,9 @@ App = angular.module('innCrisis', [])
         templateUrl: '/partials/thankyou.html'
         controller: ThankYouCtrl
 
-      .when '/admin/home',
-        templateUrl: '/partials/admin/home.html'
-        controller: HomeCtrl
-
-      .when '/admin/login',
-        templateUrl: '/partials/admin/login.html'
-        controller: LoginCtrl
-        bypassLogin: true
-
-      .when '/admin/logout',
-        templateUrl: '/partials/admin/logout.html'
-        controller: LogoutCtrl
-
-      .when '/admin/register',
-        templateUrl: '/partials/admin/register.html'
-        controller: RegisterCtrl
-        bypassLogin: true
-
-      .when '/admin/disburse',
-        templateUrl: '/partials/admin/disburse.html'
-        controller: DisburseCtrl
-
-      .when '/admin/post-disburse/:disburseId',
-        templateUrl: '/partials/admin/post-disburse.html'
-        controller: PostDisburseCtrl
-
-      .when '/admin/manage-users',
-        templateUrl: '/partials/admin/manage-users.html'
-        controller: UserManagementCtrl
-
-      .when '/admin/manage-disbursals'
-        templateUrl: '/partials/admin/manage-disbursals.html'
-        controller: ManageDisbursalsCtrl
-        resolve: ManageDisbursalsCtrl.resolve
-
-      .when '/admin/view-donations',
-        templateUrl: '/partials/admin/view-donations.html'
-        controller: DonationsCtrl
-
-      .when '/404'
-        templateUrl: '/partials/404.html'
-
       .otherwise
-        templateUrl: '/partials/404.html'
+        templateUrl: '/partials/error.html'
+        controller: ErrorCtrl
 
   .filter 'moment', ()->
     return (dateString, format)->
@@ -70,18 +29,13 @@ App = angular.module('innCrisis', [])
       else
         ''
   .run ($rootScope, $location)->
-    $rootScope.$on '$routeChangeStart', (evt, next, current)->
-      currentPath = $location.path()
-      if currentPath.indexOf('/admin') == 0
-        user = Kinvey.getCurrentUser()
-
-        if !user? and !next.$route?.bypassLogin?
-          $location.path('/admin/login')
-        else if user? and !next.$route?
-          $location.path('/admin/home')
-
-    $rootScope.$on '$routeChangeError', ()->
-      $location.path('/404').replace()
+    $rootScope.$on "$routeChangeError", (event, current, previous, rejection)->
+      if rejection
+        $rootScope.errorCode = 500
+        $rootScope.errorMessage = rejection;
+        $location.path('/500').replace()
+      else
+        $location.path('/404').replace()
 
     $rootScope.$safeApply = ($scope, fn)->
       $scope = $scope || $rootScope;
@@ -91,17 +45,20 @@ App = angular.module('innCrisis', [])
       else
         $scope.$apply(fn);
 
-
-
-  .service '$safeRedirect', ($rootScope, $location)->
+  .service '$safeLocation', ($rootScope, $location)->
     @.path = (url, replace, reload)->
-      if(reload || $rootScope.$$phase)
-        window.location = url;
+      if url?
+        $location.path()
       else
-        $location.path url
-        if replace
-          $location.replace()
-  #      $rootScope.apply()
+        if(reload || $rootScope.$$phase)
+          window.location = url;
+        else
+          $location.path url
+          if replace
+            $location.replace()
+          $rootScope.$apply()
+
+
 
 DonateCtrl = ($scope)->
   $scope.donate = ()->
@@ -140,153 +97,15 @@ ThankYouCtrl = ($scope)->
       $scope.err = error.message
       $scope.digest()
 
+ErrorCtrl = ($rootScope, $scope)->
+  if $rootScope.errorCode
+    $scope.errorCode = $rootScope.errorCode
+    delete $rootScope.errorCode
 
+  if $rootScope.errorMessage
+    $scope.errorMessage = $rootScope.errorMessage
+    delete $rootScope.errorMessage
 
-
-############################################
-##
-## ADMIN Section
-##
-############################################
-
-LoginCtrl = ($scope, $safeRedirect)->
-  $scope.register = ()->
-    $safeRedirect.path '/admin/register'
-
-  $scope.login = ()->
-    user = new Kinvey.User()
-    user.login $scope.email, $scope.password,
-      success: (user)->
-        $safeRedirect.path '/admin/home'
-      error: (err)->
-        $scope.error = err.description
-        $scope.$digest()
-
-RegisterCtrl = ($scope, $location)->
-  $scope.signIn = ()->
-    $location.path '/admin/login'
-
-  $scope.register = ()->
-    unless $scope.email.length and $scope.password.length && $scope.name
-      $scope.error = 'All form fields are required'
-    else
-      new Kinvey.User.create
-        username: $scope.email
-        password: $scope.password
-        name: $scope.name
-      ,
-        success: (user)->
-          $location.path '/admin/home'
-        error: (err)->
-          $scope.error = err.description
-          $scope.$digest()
-
-HomeCtrl = ($scope)->
-  $scope.user = Kinvey.getCurrentUser()
-
-LogoutCtrl = ($scope, $location)->
-  user = Kinvey.getCurrentUser()
-  if user
-    user.logout()
-  $location.path '/admin/login'
-
-DisburseCtrl = ($scope, $location)->
-  user = Kinvey.getCurrentUser()
-  $scope.disburse = ()->
-    disbursement = new Kinvey.Entity
-      firstName: $scope.firstName
-      lastName: $scope.lastName
-      amount: $scope.amount
-    , 'disbursements'
-    disbursement.save
-      success: (disbursement)->
-        window.location.href =  '/admin/post-disburse/'+disbursement.get('_id')
-      error: (e)->
-        $scope.err = e.message
-        $scope.$digest()
-
-PostDisburseCtrl = ($scope, $location, $routeParams)->
-  disbursements = new Kinvey.Entity {}, 'disbursements'
-  disbursements.load $routeParams.disburseId,
-    success: (disbursement)->
-      $scope.disbursement = disbursement
-      $scope.$digest()
-    error: (e)->
-      $scope.err = e.message
-      $scope.$digest()
-
-
-UserManagementCtrl = ($scope)->
-  updateUserList = ()->
-    users = new Kinvey.Collection('user')
-    users.fetch
-      resolve: ['role'],
-      success: (list)->
-        $scope.users = list
-        $scope.$digest()
-      error: (e)->
-        $scope.err = e.message
-        $scope.$digest()
-  updateUserList()
-
-  $scope.setAccess = (user, role, enabled)->
-    roles = new Kinvey.Entity {}, 'roles'
-    roles.load role,
-      success: (role)->
-        if enabled
-          user.set('role', role)
-        else
-          user.set('role', null)
-
-        user.save
-          success: (response)->
-            updateUserList()
-
-          error: (e)->
-            $scope.err = e.message
-
-      error: (e)->
-        $scope.err = e.message
-
-  $scope.hasAccess = (user, type)->
-    role = user.get('role')
-    if role?
-      role.get('_id') == type
-    else
-      false
-
-  $scope.destroy = (user)->
-    if confirm('Are you sure you want to destroy this user? You can\'t undo this.')
-      user.destroy
-        success: ()->
-          updateUserList()
-        error: (e)->
-          $scope.err = e.message
-
-ManageDisbursalsCtrl = ($scope, disbursements)->
-  $scope.disbursements = disbursements
-
-ManageDisbursalsCtrl.resolve =
-  disbursements: ($q, $rootScope)->
-    deferred = $q.defer()
-    users = new Kinvey.Collection('disbursements')
-    users.fetch
-      resolve: ['role'],
-      success: (list)->
-        $rootScope.$safeApply null, ()->
-          deferred.resolve(list)
-      error: (e)->
-        deferred.reject(e.message)
-    return deferred.promise
-
-DonationsCtrl = ($scope)->
-  updateDonations = ()->
-    donations = new Kinvey.Collection('donations');
-    donations.fetch
-      success: (list)->
-        $scope.donations = (entry.toJSON(true) for index, entry of list)
-        $scope.$digest()
-      error: (e)->
-        $scope.err = e.message
-        $scope.$digest()
-  updateDonations()
+  if !$scope.errorCode
+    $scope.errorCode = 404
+    $scope.errorMessage = "Page not found";
