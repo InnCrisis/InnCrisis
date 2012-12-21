@@ -57,23 +57,3 @@ window.App
             $rootScope.$safeApply null, ()->
               deferred.reject(e)
       deferred.promise
-
-
-
-  .service '$notification', ($rootScope)->
-    clear = @clear = ()->
-      $rootScope.$safeApply null, ()->
-        delete $rootScope.notification
-
-    @error = (opts)->
-      $rootScope.$safeApply null, ()->
-        $rootScope.notification =
-          class: 'alert-error'
-          title: opts.title
-          message: opts.message
-          loaderError: opts.loaderError?
-
-      if opts.duration?
-        setTimeout ()->
-          clear()
-        , opts.duration

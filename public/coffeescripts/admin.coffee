@@ -196,7 +196,7 @@ PostDisburseCtrl = ($scope, $location, $routeParams)->
       $scope.$digest()
 
 
-UserManagementCtrl = ($scope, users, $users, $rootScope)->
+UserManagementCtrl = ($scope, users, $users, $notification)->
   $scope.users = users
 
   $scope.setAccess = (user, role, enabled)->
@@ -204,7 +204,8 @@ UserManagementCtrl = ($scope, users, $users, $rootScope)->
       .then ()->
         $scope.users = $users.getAll()
       , (err)->
-        $scope.$parent.error = err
+        $notification.error
+          message: err.message
 
   $scope.hasAccess = (user, type)->
     $users.hasAccess(user, type)

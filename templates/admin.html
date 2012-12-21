@@ -21,6 +21,6 @@
     <div class="alert" ng-show="notification" ng-class="notification.class">
       <strong ng-bind="notification.title"></strong> <span ng-bind="notification.message"></span>
     </div>
-    <div ng-view  ng-hide="notification.loaderError">Loading...</div>
+    <div ng-view ng-hide="notification.loaderError" ng-cloak></div>
   </div>
 {% endblock %}
