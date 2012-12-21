@@ -30,12 +30,16 @@
     };
   }).run(function($rootScope, $location) {
     $rootScope.$on("$routeChangeError", function(event, current, previous, rejection) {
-      if (rejection) {
-        $rootScope.errorCode = 500;
-        $rootScope.errorMessage = rejection;
-        return $location.path('/500').replace();
-      } else {
-        return $location.path('/404').replace();
+      var currentPath;
+      currentPath = $location.path();
+      if (currentPath.indexOf('/admin') === -1) {
+        if (rejection) {
+          $rootScope.errorCode = 500;
+          $rootScope.errorMessage = rejection;
+          return $location.path('/500').replace();
+        } else {
+          return $location.path('/404').replace();
+        }
       }
     });
     return $rootScope.$safeApply = function($scope, fn) {
@@ -49,7 +53,7 @@
     };
   }).service('$safeLocation', function($rootScope, $location) {
     return this.path = function(url, replace, reload) {
-      if (url != null) {
+      if (!(url != null)) {
         return $location.path();
       } else {
         if (reload || $rootScope.$$phase) {

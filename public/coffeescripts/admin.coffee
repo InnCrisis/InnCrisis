@@ -82,21 +82,34 @@ window.App
     for routePath, route of getRoutes()
       $routeProvider.when routePath, route.arguments
 
-  .run ($rootScope, $safeLocation, $location)->
-    $rootScope.$on "$routeChangeError", (event, current, previous, rejection)->
-      if rejection
-        $rootScope.errorCode = 500
-        $rootScope.errorMessage = rejection;
-        $location.path '/admin/500'
-      else
-        $location.path '/admin/404'
+  .run ($rootScope, $safeLocation, $notification)->
+    # Sometimes when we try to resolve a path we get a rejection due to security reasons or something else
+    # This should be able to take the current page, stop rendering the template and render our error template
+    $rootScope.$on '$routeChangeError', (event, current, previous, rejection)->
+      currentPath = $safeLocation.path()
+      if currentPath.indexOf('/admin') == 0
+        if rejection
+          $notification.error
+            loaderError: true
+            title: rejection.error
+            message: rejection.description
+
+        else
+          $notification.error
+            loaderError: true
+            title: '404'
+            message: 'Page not found'
 
     $rootScope.$on '$routeChangeStart', (evt, next, current)->
-      currentPath = $location.path()
+      currentPath = $safeLocation.path()
       if currentPath.indexOf('/admin') == 0
         user = Kinvey.getCurrentUser()
         if !user? and !next.$route?.bypassLogin?
-          $location.path('/admin/login')
+          $safeLocation.path('/admin/login')
+
+    $rootScope.$on '$routeChangeSuccess', (evt, next, current)->
+      $notification.clear()
+
 
 window.NavigationCtrl = ($rootScope, $scope, $location)->
   getNavRoutes = ()->
@@ -109,9 +122,12 @@ window.NavigationCtrl = ($rootScope, $scope, $location)->
           active: path == $location.path()
     routes
   $scope.routes = getNavRoutes()
-  $rootScope.$on '$routeChangeSuccess', ()->
+
+  $rootScope.$on '$routeChangeStart', ()->
     $scope.routes = getNavRoutes()
 
+window.ErrorCtrl = ($scope, $rootScope)->
+  $rootScope
 
 LoginCtrl = ($scope, $safeLocation)->
   $scope.register = ()->
@@ -180,56 +196,30 @@ PostDisburseCtrl = ($scope, $location, $routeParams)->
       $scope.$digest()
 
 
-UserManagementCtrl = ($scope, users)->
+UserManagementCtrl = ($scope, users, $users, $rootScope)->
   $scope.users = users
 
   $scope.setAccess = (user, role, enabled)->
-    roles = new Kinvey.Entity {}, 'roles'
-    roles.load role,
-      success: (role)->
-        if enabled
-          user.set('role', role)
-        else
-          user.set('role', null)
-
-        user.save
-          success: (response)->
-            updateUserList()
-
-          error: (e)->
-            $scope.err = e.message
-
-      error: (e)->
-        $scope.err = e.message
+    $users.setAccess(user, role, enabled)
+      .then ()->
+        $scope.users = $users.getAll()
+      , (err)->
+        $scope.$parent.error = err
 
   $scope.hasAccess = (user, type)->
-    role = user.get('role')
-    if role?
-      role.get('_id') == type
-    else
-      false
+    $users.hasAccess(user, type)
 
   $scope.destroy = (user)->
-    if confirm('Are you sure you want to destroy this user? You can\'t undo this.')
-      user.destroy
-        success: ()->
-          updateUserList()
-        error: (e)->
-          $scope.err = e.message
+    $users.destroy(user)
+      .then ()->
+        $scope.users = $users.getAll()
+      , (err)->
+        $scope.$parent.error = err
+
 
 UserManagementCtrl.resolve =
-  users: ($q, $rootScope)->
-    deferred = $q.defer()
-    users = new Kinvey.Collection('user')
-    users.fetch
-      resolve: ['role'],
-      success: (list)->
-        $rootScope.$safeApply null, ()->
-          deferred.resolve(list)
-      error: (e)->
-        $rootScope.$safeApply null, ()->
-          deferred.reject(e.message)
-    deferred.promise
+  users: ($users)->
+    $users.getAll()
 
 
 ManageDisbursalsCtrl = ($scope, disbursements)->
@@ -245,7 +235,8 @@ ManageDisbursalsCtrl.resolve =
         $rootScope.$safeApply null, ()->
           deferred.resolve(list)
       error: (e)->
-        deferred.reject(e.message)
+        $rootScope.$safeApply null, ()->
+          deferred.reject(e)
     return deferred.promise
 
 DonationsCtrl = ($scope, donations)->

@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
 
 {% block scripts %}
-  <script src="/javascripts/admin.js"></script>
+<script src="/javascripts/admin.js"></script>
+<script src="/javascripts/adminServices.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -17,6 +18,9 @@
     </div>
   </div>
   <div class="container">
-    <div ng-view>Loading...</div>
+    <div class="alert" ng-show="notification" ng-class="notification.class">
+      <strong ng-bind="notification.title"></strong> <span ng-bind="notification.message"></span>
+    </div>
+    <div ng-view  ng-hide="notification.loaderError">Loading...</div>
   </div>
 {% endblock %}

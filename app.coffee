@@ -3,23 +3,7 @@ http = require 'http'
 path = require 'path'
 less = require 'less-middleware'
 nunjucks = require 'nunjucks'
-request = require 'request'
-Kinvey = require 'kinvey'
 expressCoffee = require 'express-coffee'
-
-Kinvey.init
-  appKey: 'kid_eeg1EyERV5'
-  masterSecret: '0385617783be46ffa9ba48cc9482bdec'
-
-donations = new Kinvey.Collection('donations')
-
-wepaySettings =
-  clientId     : '189346'
-  clientSecret : '95e1702291'
-  accessToken  : '654d1dee01cd77a3aec989b216997396ff937c5c501e18f45a2af82ec36b7fcd'
-  accountId    : '180153296'
-  baseUri: 'https://stage.wepayapi.com/v2/'
-
 
 app = express()
 
@@ -37,14 +21,13 @@ app.configure ->
   app.use express.errorHandler()
 
   app.use expressCoffee
-    path: __dirname + '/public',
-    live: !process.env.PRODUCTION,
+    path: __dirname + '/public'
+    live: !process.env.PRODUCTION
     uglify: process.env.PRODUCTION
 
   app.use less
     src: path.join __dirname, 'public'
     once: false
-    compress: true
 
   app.use express.favicon __dirname + '/public/images/favicon.ico'
   app.use express.static __dirname + '/public'

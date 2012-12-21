@@ -30,12 +30,14 @@ window.App = App = angular.module('innCrisis', [])
         ''
   .run ($rootScope, $location)->
     $rootScope.$on "$routeChangeError", (event, current, previous, rejection)->
-      if rejection
-        $rootScope.errorCode = 500
-        $rootScope.errorMessage = rejection;
-        $location.path('/500').replace()
-      else
-        $location.path('/404').replace()
+      currentPath = $location.path()
+      if currentPath.indexOf('/admin') == -1
+        if rejection
+          $rootScope.errorCode = 500
+          $rootScope.errorMessage = rejection;
+          $location.path('/500').replace()
+        else
+          $location.path('/404').replace()
 
     $rootScope.$safeApply = ($scope, fn)->
       $scope = $scope || $rootScope;
@@ -47,7 +49,7 @@ window.App = App = angular.module('innCrisis', [])
 
   .service '$safeLocation', ($rootScope, $location)->
     @.path = (url, replace, reload)->
-      if url?
+      if !url?
         $location.path()
       else
         if(reload || $rootScope.$$phase)
