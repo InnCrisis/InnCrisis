@@ -17,15 +17,15 @@
     <td>{{ user.name }}</td>
     <td>{{ user.username }}</td>
     <td>
-      <div class="btn" ng-click="setAccess(user, 'user', true)" ng-hide="hasAccess(user,'user')">Make User</div>
-      <div class="btn" ng-click="setAccess(user, 'user', false)" ng-hide="!hasAccess(user, 'user')">Remove User</div>
+      <div class="btn" ng-click="setRole(user, 'user', true)" ng-hide="isRole(user,'user')">Make User</div>
+      <div class="btn btn-danger" ng-click="setRole(user, 'user', false)" ng-hide="!isRole(user, 'user')">Remove User</div>
     </td>
     <td>
-      <div class="btn" ng-click="setAccess(user, 'admin', true)" ng-hide="hasAccess(user,'admin')">Make Admin</div>
-      <div class="btn" ng-click="setAccess(user, 'admin', false)" ng-hide="!hasAccess(user, 'admin')">Remove Admin</div>
+      <div class="btn" ng-click="setRole(user, 'admin', true)" ng-hide="isRole(user,'admin')">Make Admin</div>
+      <div class="btn btn-danger" ng-click="setRole(user, 'admin', false)" ng-hide="!isRole(user, 'admin')">Remove Admin</div>
     </td>
-    <td>
-      <div class="btn" ng-click="destroy(user)">Destroy User</div>
-    </td>
+    <!--<td>-->
+      <!--<div class="btn" ng-click="destroy(user)">Destroy User</div>-->
+    <!--</td>-->
   </tr>
 </table>

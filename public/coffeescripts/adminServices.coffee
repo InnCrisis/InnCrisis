@@ -24,7 +24,7 @@ window.App
             deferred.reject(e)
       deferred.promise
 
-    @setAccess = (usr, role, enabled)->
+    @setRole = (usr, role, enabled)->
       deferred = $q.defer()
       getById usr._id , (e, user)->
         if e
@@ -56,12 +56,34 @@ window.App
 
       deferred.promise
 
-    @hasAccess = (user, type)->
+    @isRole = (user, type)->
       role = user.role
       if role?
         role._id == type
       else
         false
+
+    @hasAccess = (user, type)->
+      deferred = $q.defer()
+
+      if user.role?
+        if user.role._id == type
+          deferred.resolve true
+        else
+          # We need to look up the role inheritence
+          roles = new Kinvey.Entity {}, 'roles'
+          roles.load user.role._id,
+            success: (role)->
+              $rootScope.$safeApply null, ()->
+                deferred.resolve role.get('inherits') == type
+            error: (e)->
+              $rootScope.$safeApply null, ()->
+                deferred.reject
+                  message: e.description
+      else
+        deferred.resolve false
+
+      deferred.promise
 
     @destroy = (usr)->
       deferred = $q.defer()

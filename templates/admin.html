@@ -10,7 +10,7 @@
     <div class="navbar">
       <div class="navbar-inner">
         <ul class="nav">
-          <li ng-repeat="route in routes" ng-class="{active: route.active}">
+          <li ng-repeat="route in routes" ng-class="{active: route.active, loading: route.loading}" class="loading">
             <a href="{{route.path}}">{{route.name}}</a>
           </li>
         </ul>

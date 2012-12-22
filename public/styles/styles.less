@@ -1,91 +1,73 @@
-@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,400italic,800);
+/*!
+ * Bootstrap v2.2.2
+ *
+ * Copyright 2012 Twitter, Inc
+ * Licensed under the Apache License v2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Designed and built with all the love in the world @twitter by @mdo and @fat.
+ */
 
-/* Reset */
-html, body, h1, p, div, ol, li {
-  margin: 0;
-  padding: 0;
-}
+// CSS Reset
+@import "bootstrap/reset.less";
 
-/* Typography */
-body {
-    font-family: "Open Sans", sans-serif;
-    color: #00678C;
-    font-size: 18px;
-}
+// Core variables and mixins
+@import "bootstrap/variables.less"; // Modify this for custom colors, font-sizes, etc
 
-h1 {
-    font-weight: 800;
-    font-size: 48px;
-//    text-transform: uppercase;
-}
+@import "bootstrap/mixins.less";
 
-#description {
-    font-size: 24px;
-    line-height: 120%;
-}
+// Grid system and page structure
+@import "bootstrap/scaffolding.less";
+@import "bootstrap/grid.less";
+@import "bootstrap/layouts.less";
 
-/* Layout */
-header {
-    padding: 50px 18% 40px;
-}
+// Base CSS
+@import "bootstrap/type.less";
+@import "bootstrap/code.less";
+@import "bootstrap/forms.less";
+@import "bootstrap/tables.less";
 
-section {
-    padding: 40px 18%;
-}
+// Components: common
+@import "bootstrap/sprites.less";
+@import "bootstrap/dropdowns.less";
+@import "bootstrap/wells.less";
+@import "bootstrap/component-animations.less";
+@import "bootstrap/close.less";
 
-.highlighted {
-    padding: 20px 18%;
-    background: #00678C;
-    color: #fff;
-}
+// Components: Buttons & Alerts
+@import "bootstrap/buttons.less";
+@import "bootstrap/button-groups.less";
+@import "bootstrap/alerts.less"; // Note: alerts share common CSS with buttons and thus have styles in buttons.less
 
-dt { 
-    background: #fff;
-    color: #00678C;
-    float: left;
-    padding: 1px 9px;
-}
+// Components: Nav
+@import "bootstrap/navs.less";
+@import "bootstrap/navbar.less";
+@import "bootstrap/breadcrumbs.less";
+@import "bootstrap/pagination.less";
+@import "bootstrap/pager.less";
 
-dd {
-    margin-bottom: 10px;
-}
+// Components: Popovers
+@import "bootstrap/modals.less";
+@import "bootstrap/tooltip.less";
+@import "bootstrap/popovers.less";
 
-/* Buttons */
-.button {
-    text-decoration: none;
-    font-weight: 800;
-    font-size: 24px;
-    color: #00678C;
-    border: 4px solid #00678C;
-    padding: 20px;
-    width: 180px;
-    display: block;
-    margin-right: 20px;
-    float: left;
-}
+// Components: Misc
+@import "bootstrap/thumbnails.less";
+@import "bootstrap/media.less";
+@import "bootstrap/labels-badges.less";
+@import "bootstrap/progress-bars.less";
+@import "bootstrap/accordion.less";
+@import "bootstrap/carousel.less";
+@import "bootstrap/hero-unit.less";
 
-.button:active {
-    color: #fff;
-    background: #00678C;
-}
+// Utility classes
+@import "bootstrap/utilities.less"; // Has to be last to override when necessary
 
-.button.major, input[type=submit] {
-    color: #fff;
-    background: #D93600;
-    border-color: #D93600;
-}
 
-.button.major:active, input[type=submit]:active {
-    background: #C63100;
-    border-color: #C63100;
-}
-.notification{
-  position: fixed;
-  top: 0px;
-  width: 100%;
-  left: 0;
-  z-index: 10;
-  &:hover{
-    display: none;
-  }
-}
+@import "bootstrap/responsive.less";
+
+
+
+@import "bootswatch.less";
+@import "variables.less"; //Our overrides this will allow us to update bootstrap without breaking stuff
+@import "common.less";

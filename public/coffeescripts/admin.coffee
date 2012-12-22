@@ -15,7 +15,7 @@ getRoutes = ()->
 
   '/admin/logout':
     name: 'Logout'
-    security: 'user'
+    showIfLoggedIn: true
     arguments:
       templateUrl: '/partials/admin/logout.html'
       controller: LogoutCtrl
@@ -104,7 +104,7 @@ window.App
 
 
 window.NavigationCtrl = ($rootScope, $scope, $location, $users)->
-  getNavRoutes = ()->
+  getNavRoutes = (loading = false)->
     user = Kinvey.getCurrentUser()
     routes = []
     for path, route of getRoutes()
@@ -136,12 +136,19 @@ window.NavigationCtrl = ($rootScope, $scope, $location, $users)->
           path: path
           name: route.name
           active: path == $location.path()
+          loading: loading
 
     routes
   $scope.routes = getNavRoutes()
 
   $rootScope.$on '$routeChangeStart', ()->
-    $scope.routes = getNavRoutes()
+    $scope.routes = getNavRoutes(true)
+
+  $rootScope.$on '$routeChangeSuccess', ()->
+    $scope.routes = getNavRoutes(false)
+
+  $rootScope.$on '$routeChangeError', ()->
+    $scope.routes = getNavRoutes(false)
 
 window.ErrorCtrl = ($scope, $rootScope)->
   $rootScope
@@ -216,16 +223,16 @@ PostDisburseCtrl = ($scope, $location, $routeParams)->
 UserManagementCtrl = ($scope, users, $users, $notification)->
   $scope.users = users
 
-  $scope.setAccess = (user, role, enabled)->
-    $users.setAccess(user, role, enabled)
+  $scope.setRole = (user, role, enabled)->
+    $users.setRole(user, role, enabled)
       .then (usr)->
         user.role = usr.role
       , (err)->
         $notification.error
           message: err.message
 
-  $scope.hasAccess = (user, type)->
-    $users.hasAccess(user, type)
+  $scope.isRole = (user, type)->
+    $users.isRole(user, type)
 
   $scope.destroy = (user)->
     $users.destroy(user)
