@@ -1,6 +1,19 @@
 <h1>Disburse Money</h1>
 Money Disbursed!
 <br>
-{{disbursement}}
+<dl>
+  <dt>First Name</dt>
+  <dd>{{disbursement.firstName}}</dd>
+  <dt>Last Name</dt>
+  <dd>{{disbursement.lastName}}</dd>
+  <dt>Amount</dt>
+  <dd>{{disbursement.amount | currency}}</dd>
+</dl>
 <br>
-<a href="/admin/disburse">Disburse More</a>
+<a href="/admin/disburse" class="btn btn-primary">Disburse More</a>
+<br>
+<br>
+<br>
+<br>
+{{disbursement}}
+

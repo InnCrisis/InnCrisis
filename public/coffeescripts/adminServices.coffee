@@ -71,7 +71,9 @@ window.App
           deferred.resolve true
         else
           # We need to look up the role inheritence
-          roles = new Kinvey.Entity {}, 'roles'
+          roles = new Kinvey.Entity {}, 'roles',
+            store: 'cached'
+
           roles.load user.role._id,
             success: (role)->
               $rootScope.$safeApply null, ()->
@@ -114,4 +116,31 @@ window.App
         error: (e)->
           $rootScope.$safeApply null, ()->
             deferred.reject e
+      deferred.promise
+
+  .service '$disbursements', ($q, $rootScope)->
+    @getById = (id)->
+      deferred = $q.defer()
+      disbursements = new Kinvey.Entity {}, 'disbursements'
+      disbursements.load id,
+        success: (disbursement)->
+          $rootScope.$safeApply null, ()->
+            deferred.resolve disbursement.toJSON(true)
+        error: (e)->
+          $rootScope.$safeApply null, ()->
+            deferred.reject e
+
+      deferred.promise
+
+    @getAll = ()->
+      deferred = $q.defer()
+      disbursements = new Kinvey.Collection('disbursements')
+      disbursements.fetch
+        resolve: ['role'],
+        success: (list)->
+          $rootScope.$safeApply null, ()->
+            deferred.resolve (entry.toJSON(true) for index, entry of list)
+        error: (e)->
+          $rootScope.$safeApply null, ()->
+            deferred.reject(e)
       deferred.promise

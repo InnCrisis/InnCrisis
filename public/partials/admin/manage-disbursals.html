@@ -7,8 +7,8 @@
     <th>Amount</th>
   </thead>
   <tr ng-repeat="disbursal in disbursements">
-    <td>{{disbursal.get('firstName')}}</td>
-    <td>{{disbursal.get('lastName')}}</td>
-    <td>{{disbursal.get('amount')}}</td>
+    <td>{{disbursal.firstName}}</td>
+    <td>{{disbursal.lastName}}</td>
+    <td>{{disbursal.amount | currency}}</td>
   </tr>
 </table>

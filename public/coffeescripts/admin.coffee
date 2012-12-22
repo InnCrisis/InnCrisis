@@ -42,6 +42,7 @@ getRoutes = ()->
     arguments:
       templateUrl: '/partials/admin/post-disburse.html'
       controller: PostDisburseCtrl
+      resolve: PostDisburseCtrl.resolve
 
   '/admin/manage-users':
     name: 'Manage Users'
@@ -209,16 +210,12 @@ DisburseCtrl = ($scope, $location)->
         $scope.err = e.message
         $scope.$digest()
 
-PostDisburseCtrl = ($scope, $location, $routeParams)->
-  disbursements = new Kinvey.Entity {}, 'disbursements'
-  disbursements.load $routeParams.disburseId,
-    success: (disbursement)->
-      $scope.disbursement = disbursement
-      $scope.$digest()
-    error: (e)->
-      $scope.err = e.message
-      $scope.$digest()
+PostDisburseCtrl = ($scope, $routeParams, disbursement)->
+  $scope.disbursement = disbursement
 
+PostDisburseCtrl.resolve =
+  disbursement: ($route, $disbursements)->
+    $disbursements.getById($route.current.params.disburseId)
 
 UserManagementCtrl = ($scope, users, $users, $notification)->
   $scope.users = users
@@ -251,18 +248,9 @@ ManageDisbursalsCtrl = ($scope, disbursements)->
   $scope.disbursements = disbursements
 
 ManageDisbursalsCtrl.resolve =
-  disbursements: ($q, $rootScope)->
-    deferred = $q.defer()
-    users = new Kinvey.Collection('disbursements')
-    users.fetch
-      resolve: ['role'],
-      success: (list)->
-        $rootScope.$safeApply null, ()->
-          deferred.resolve(list)
-      error: (e)->
-        $rootScope.$safeApply null, ()->
-          deferred.reject(e)
-    return deferred.promise
+  disbursements: ($disbursements)->
+    $disbursements.getAll()
+
 
 DonationsCtrl = ($scope, donations)->
   $scope.donations = donations
