@@ -201,8 +201,8 @@ UserManagementCtrl = ($scope, users, $users, $notification)->
 
   $scope.setAccess = (user, role, enabled)->
     $users.setAccess(user, role, enabled)
-      .then ()->
-        $scope.users = $users.getAll()
+      .then (usr)->
+        user.role = usr.role
       , (err)->
         $notification.error
           message: err.message
@@ -244,14 +244,5 @@ DonationsCtrl = ($scope, donations)->
   $scope.donations = donations
 
 DonationsCtrl.resolve =
-  donations: ($q, $rootScope)->
-    deferred = $q.defer()
-    donations = new Kinvey.Collection('donations');
-    donations.fetch
-      success: (list)->
-        $rootScope.$safeApply null, ()->
-          deferred.resolve (entry.toJSON(true) for index, entry of list)
-      error: (e)->
-        $rootScope.$safeApply null, ()->
-          deferred.reject e.message
-    deferred.promise
+  donations: ($donations)->
+    $donations.getAll()

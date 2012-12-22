@@ -1,5 +1,14 @@
 window.App
   .service '$users', ($q, $rootScope)->
+    getById = (id, callback)->
+      userEntity = new Kinvey.Entity({}, 'user');
+      userEntity.load id,
+        resolve: ['role'],
+        success: (user)->
+          callback null, user
+        error: (e)->
+          callback e
+
     @getAll = ()->
       deferred = $q.defer()
       users = new Kinvey.Collection('user')
@@ -7,42 +16,48 @@ window.App
         resolve: ['role'],
         success: (list)->
           $rootScope.$safeApply null, ()->
-            deferred.resolve(list)
+            deferred.resolve (entry.toJSON(true) for index, entry of list)
         error: (e)->
           $rootScope.$safeApply null, ()->
-            deferred.reject(e.message)
+            deferred.reject(e)
       deferred.promise
 
-    @setAccess = (user, role, enabled)->
+    @setAccess = (usr, role, enabled)->
       deferred = $q.defer()
-      roles = new Kinvey.Entity {}, 'roles'
-      roles.load role,
-        success: (role)->
-          if enabled
-            user.set('role', role)
-          else
-            user.set('role', null)
+      getById usr._id , (e, user)->
+        if e
+          $rootScope.$safeApply null, ()->
+            deferred.reject
+              message: e.description
+        else
+          roles = new Kinvey.Entity {}, 'roles'
+          roles.load role,
+            success: (role)->
+              if enabled
+                user.set('role', role)
+              else
+                user.set('role', null)
 
-          user.save
-            success: (response)->
-              $rootScope.$safeApply null, ()->
-                deferred.resolve()
+              user.save
+                success: (response)->
+                  $rootScope.$safeApply null, ()->
+                    deferred.resolve response.toJSON(true)
+                error: (e)->
+                  $rootScope.$safeApply null, ()->
+                    deferred.reject
+                      message: e.description
+
             error: (e)->
               $rootScope.$safeApply null, ()->
                 deferred.reject
                   message: e.description
 
-        error: (e)->
-          $rootScope.$safeApply null, ()->
-            deferred.reject
-              message: e.description
-
       deferred.promise
 
     @hasAccess = (user, type)->
-      role = user.get('role')
+      role = user.role
       if role?
-        role.get('_id') == type
+        role._id == type
       else
         false
 
@@ -55,5 +70,19 @@ window.App
               deferred.resolve()
           error: (e)->
             $rootScope.$safeApply null, ()->
-              deferred.reject(e)
+              deferred.reject e
+
+      deferred.promise
+
+  .service '$donations', ($q, $rootScope)->
+    @getAll = ()->
+      deferred = $q.defer()
+      donations = new Kinvey.Collection('donations');
+      donations.fetch
+        success: (list)->
+          $rootScope.$safeApply null, ()->
+            deferred.resolve (entry.toJSON(true) for index, entry of list)
+        error: (e)->
+          $rootScope.$safeApply null, ()->
+            deferred.reject e
       deferred.promise

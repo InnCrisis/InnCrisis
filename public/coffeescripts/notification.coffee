@@ -24,7 +24,8 @@ window.App
           loaderError: opts.loaderError?
 
       opts.duration ?= 2000
-      if opts.duration != false
+
+      if opts.duration != false and !opts.loaderError
         notificationTimeout = setTimeout ()->
           clear()
         , opts.duration

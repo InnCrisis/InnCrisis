@@ -14,8 +14,8 @@
     <th>Admin</th>
   </tr>
   <tr ng-repeat="user in users">
-    <td>{{ user.get('name') }}</td>
-    <td>{{ user.get('username') }}</td>
+    <td>{{ user.name }}</td>
+    <td>{{ user.username }}</td>
     <td>
       <div class="btn" ng-click="setAccess(user, 'user', true)" ng-hide="hasAccess(user,'user')">Make User</div>
       <div class="btn" ng-click="setAccess(user, 'user', false)" ng-hide="!hasAccess(user, 'user')">Remove User</div>

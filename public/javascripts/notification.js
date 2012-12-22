@@ -26,7 +26,7 @@
         };
       });
       if ((_ref = opts.duration) == null) opts.duration = 2000;
-      if (opts.duration !== false) {
+      if (opts.duration !== false && !opts.loaderError) {
         return notificationTimeout = setTimeout(function() {
           return clear();
         }, opts.duration);
