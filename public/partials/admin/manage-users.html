@@ -24,8 +24,8 @@
       <div class="btn" ng-click="setAccess(user, 'admin', true)" ng-hide="hasAccess(user,'admin')">Make Admin</div>
       <div class="btn" ng-click="setAccess(user, 'admin', false)" ng-hide="!hasAccess(user, 'admin')">Remove Admin</div>
     </td>
-    <!--<td>-->
-      <!--<div class="btn" ng-click="destroy(user)">Destroy User</div>-->
-    <!--</td>-->
+    <td>
+      <div class="btn" ng-click="destroy(user)">Destroy User</div>
+    </td>
   </tr>
 </table>

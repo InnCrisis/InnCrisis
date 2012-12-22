@@ -1,16 +1,13 @@
 getRoutes = ()->
   '/admin/home':
     name: 'Home'
-    security: ''
-    showInNav: true
     arguments:
       templateUrl: '/partials/admin/home.html'
       controller: HomeCtrl
 
   '/admin/login':
     name: 'Login'
-    security: ''
-    showInNav: true
+    showIfLoggedIn: false
     arguments:
       templateUrl: '/partials/admin/login.html'
       controller: LoginCtrl
@@ -18,16 +15,14 @@ getRoutes = ()->
 
   '/admin/logout':
     name: 'Logout'
-    security: ''
-    showInNav: true
+    security: 'user'
     arguments:
       templateUrl: '/partials/admin/logout.html'
       controller: LogoutCtrl
 
   '/admin/register':
     name: 'Register'
-    security: ''
-    showInNav: true
+    showIfLoggedIn: false
     arguments:
       templateUrl: '/partials/admin/register.html'
       controller: RegisterCtrl
@@ -36,7 +31,6 @@ getRoutes = ()->
   '/admin/disburse':
     name: 'Disburse Money'
     security: 'user'
-    showInNav: true
     arguments:
       templateUrl: '/partials/admin/disburse.html'
       controller: DisburseCtrl
@@ -44,6 +38,7 @@ getRoutes = ()->
   '/admin/post-disburse/:disburseId':
     name: 'Post Disburse'
     security: 'user'
+    showInNav: false
     arguments:
       templateUrl: '/partials/admin/post-disburse.html'
       controller: PostDisburseCtrl
@@ -51,7 +46,6 @@ getRoutes = ()->
   '/admin/manage-users':
     name: 'Manage Users'
     security: 'admin'
-    showInNav: true
     arguments:
       templateUrl: '/partials/admin/manage-users.html'
       controller: UserManagementCtrl
@@ -60,7 +54,6 @@ getRoutes = ()->
   '/admin/manage-disbursals':
     name: 'Manage Disbursals'
     security: 'user'
-    showInNav: true
     arguments:
       templateUrl: '/partials/admin/manage-disbursals.html'
       controller: ManageDisbursalsCtrl
@@ -68,8 +61,7 @@ getRoutes = ()->
 
   '/admin/view-donations':
     name: 'View Donations'
-    security: 'user'
-    showInNav: true
+    security: 'admin'
     arguments:
       templateUrl: '/partials/admin/view-donations.html'
       controller: DonationsCtrl
@@ -111,15 +103,40 @@ window.App
       $notification.clear()
 
 
-window.NavigationCtrl = ($rootScope, $scope, $location)->
+window.NavigationCtrl = ($rootScope, $scope, $location, $users)->
   getNavRoutes = ()->
+    user = Kinvey.getCurrentUser()
     routes = []
     for path, route of getRoutes()
-      if route.showInNav?
+      route.security ?= ''
+      route.showIfLoggedIn ?= true
+      route.showInNav ?= true
+
+      showIfLoggedInCheck = false
+      if user
+        if route.showIfLoggedIn
+          showIfLoggedInCheck = true
+        else
+          showIfLoggedInCheck = false
+      else
+        if route.showIfLoggedIn
+          showIfLoggedInCheck = false
+        else
+          showIfLoggedInCheck = true
+
+      securityCheck = false
+      if route.security.length
+        if user
+          securityCheck = $users.hasAccess user.toJSON(true), route.security
+      else
+        securityCheck = true
+
+      if route.showInNav and showIfLoggedInCheck and securityCheck
         routes.push
           path: path
           name: route.name
           active: path == $location.path()
+
     routes
   $scope.routes = getNavRoutes()
 
@@ -142,9 +159,9 @@ LoginCtrl = ($scope, $safeLocation)->
         $scope.error = err.description
         $scope.$digest()
 
-RegisterCtrl = ($scope, $location)->
+RegisterCtrl = ($scope, $safeLocation)->
   $scope.signIn = ()->
-    $location.path '/admin/login'
+    $safeLocation.path '/admin/login'
 
   $scope.register = ()->
     unless $scope.email.length and $scope.password.length && $scope.name
@@ -156,7 +173,7 @@ RegisterCtrl = ($scope, $location)->
         name: $scope.name
       ,
         success: (user)->
-          $location.path '/admin/home'
+          $safeLocation.path '/admin/home'
         error: (err)->
           $scope.error = err.description
           $scope.$digest()

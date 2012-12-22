@@ -11,12 +11,14 @@ window.App
 
     @getAll = ()->
       deferred = $q.defer()
-      users = new Kinvey.Collection('user')
+      query = new Kinvey.Query()
+      query.on('name').exist()
+      users = new Kinvey.Collection('user', {query: query})
       users.fetch
         resolve: ['role'],
         success: (list)->
           $rootScope.$safeApply null, ()->
-            deferred.resolve (entry.toJSON(true) for index, entry of list)
+            deferred.resolve  (entry.toJSON(true) for index, entry of list)
         error: (e)->
           $rootScope.$safeApply null, ()->
             deferred.reject(e)
@@ -61,16 +63,21 @@ window.App
       else
         false
 
-    @destroy = (user)->
+    @destroy = (usr)->
       deferred = $q.defer()
       if confirm('Are you sure you want to destroy this user? You can\'t undo this.')
-        user.destroy
-          success: ()->
-            $rootScope.$safeApply null, ()->
-              deferred.resolve()
-          error: (e)->
+        getById usr._id, (e, user)->
+          if e
             $rootScope.$safeApply null, ()->
               deferred.reject e
+          else
+            user.destroy
+              success: ()->
+                $rootScope.$safeApply null, ()->
+                  deferred.resolve()
+              error: (e)->
+                $rootScope.$safeApply null, ()->
+                  deferred.reject e
 
       deferred.promise
 
