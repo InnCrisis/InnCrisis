@@ -152,8 +152,6 @@ window.NavigationCtrl = ($rootScope, $scope, $location, $users)->
   $rootScope.$on '$routeChangeError', ()->
     $scope.routes = getNavRoutes(false)
 
-window.ErrorCtrl = ($scope, $rootScope)->
-  $rootScope
 
 LoginCtrl = ($scope, $safeLocation, $users)->
   $scope.register = ()->
