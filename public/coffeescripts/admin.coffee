@@ -4,6 +4,7 @@ getRoutes = ()->
     arguments:
       templateUrl: '/partials/admin/home.html'
       controller: HomeCtrl
+      resolve: HomeCtrl.resolve
 
   '/admin/login':
     name: 'Login'
@@ -75,7 +76,7 @@ window.App
     for routePath, route of getRoutes()
       $routeProvider.when routePath, route.arguments
 
-  .run ($rootScope, $safeLocation, $notification)->
+  .run ($rootScope, $safeLocation, $notification, $users)->
     # Sometimes when we try to resolve a path we get a rejection due to security reasons or something else
     # This should be able to take the current page, stop rendering the template and render our error template
     $rootScope.$on '$routeChangeError', (event, current, previous, rejection)->
@@ -96,7 +97,7 @@ window.App
     $rootScope.$on '$routeChangeStart', (evt, next, current)->
       currentPath = $safeLocation.path()
       if currentPath.indexOf('/admin') == 0
-        user = Kinvey.getCurrentUser()
+        user = $users.get()
         if !user? and !next.$route?.bypassLogin?
           $safeLocation.path('/admin/login')
 
@@ -106,7 +107,7 @@ window.App
 
 window.NavigationCtrl = ($rootScope, $scope, $location, $users)->
   getNavRoutes = (loading = false)->
-    user = Kinvey.getCurrentUser()
+    user = $users.get()
     routes = []
     for path, route of getRoutes()
       route.security ?= ''
@@ -128,7 +129,7 @@ window.NavigationCtrl = ($rootScope, $scope, $location, $users)->
       securityCheck = false
       if route.security.length
         if user
-          securityCheck = $users.hasAccess user.toJSON(true), route.security
+          securityCheck = $users.hasAccess user, route.security
       else
         securityCheck = true
 
@@ -154,20 +155,19 @@ window.NavigationCtrl = ($rootScope, $scope, $location, $users)->
 window.ErrorCtrl = ($scope, $rootScope)->
   $rootScope
 
-LoginCtrl = ($scope, $safeLocation)->
+LoginCtrl = ($scope, $safeLocation, $users)->
   $scope.register = ()->
     $safeLocation.path '/admin/register'
 
   $scope.login = ()->
-    user = new Kinvey.User()
-    user.login $scope.email, $scope.password,
-      success: (user)->
+    $users.login $scope.email, $scope.password
+      .then (user)->
         $safeLocation.path '/admin/home'
-      error: (err)->
+      , (err)->
         $scope.error = err.description
         $scope.$digest()
 
-RegisterCtrl = ($scope, $safeLocation)->
+RegisterCtrl = ($scope, $safeLocation, $users)->
   $scope.signIn = ()->
     $safeLocation.path '/admin/login'
 
@@ -175,40 +175,35 @@ RegisterCtrl = ($scope, $safeLocation)->
     unless $scope.email.length and $scope.password.length && $scope.name
       $scope.error = 'All form fields are required'
     else
-      new Kinvey.User.create
-        username: $scope.email
-        password: $scope.password
-        name: $scope.name
-      ,
-        success: (user)->
+      $users.register $scope.email, $scope.password, $scope.name
+        .then ()->
           $safeLocation.path '/admin/home'
-        error: (err)->
-          $scope.error = err.description
-          $scope.$digest()
+        , (e)->
+          $scope.$safeApply $scope, ()->
+            $scope.error = e.description
 
-HomeCtrl = ($scope)->
-  $scope.user = Kinvey.getCurrentUser()
+HomeCtrl = ($scope, user)->
+  $scope.user = user
 
-LogoutCtrl = ($scope, $location)->
-  user = Kinvey.getCurrentUser()
-  if user
-    user.logout()
-  $location.path '/admin/login'
+HomeCtrl.resolve =
+  user: ($users)->
+    $users.get()
 
-DisburseCtrl = ($scope, $location)->
-  user = Kinvey.getCurrentUser()
+LogoutCtrl = ($scope, $safeLocation, $users)->
+  $users.logout()
+  $safeLocation.path '/admin/login'
+
+DisburseCtrl = ($scope, $safeLocation, $disbursements)->
   $scope.disburse = ()->
-    disbursement = new Kinvey.Entity
+    $disbursements.create
       firstName: $scope.firstName
       lastName: $scope.lastName
       amount: $scope.amount
-    , 'disbursements'
-    disbursement.save
-      success: (disbursement)->
-        window.location.href =  '/admin/post-disburse/'+disbursement.get('_id')
-      error: (e)->
-        $scope.err = e.message
-        $scope.$digest()
+      .then (disbursement)->
+        $safeLocation.path '/admin/post-disburse/'+disbursement._id
+      ,(e)->
+        $scope.$safeApply $scope, ()->
+          $scope.err = e.message
 
 PostDisburseCtrl = ($scope, $routeParams, disbursement)->
   $scope.disbursement = disbursement

@@ -1,4 +1,18 @@
 window.App
+  .service '$safeLocation', ($rootScope, $location)->
+    @path = (url, replace, reload)->
+      if !url?
+        $location.path()
+      else
+        if(reload || $rootScope.$$phase)
+          console.log 'PHASE'
+          window.location = url;
+        else
+          $rootScope.$safeApply null, ()->
+            $location.path url
+            if replace
+              $location.replace()
+
   .service '$users', ($q, $rootScope)->
     getById = (id, callback)->
       userEntity = new Kinvey.Entity({}, 'user');
@@ -8,6 +22,37 @@ window.App
           callback null, user
         error: (e)->
           callback e
+
+    @get = ()->
+      Kinvey.getCurrentUser().toJSON(true)
+
+    @register = (username, password, name)->
+      deferred = $q.defer()
+      new Kinvey.User.create
+        username: username
+        password: password
+        name: name
+      ,
+        success: (user)->
+          $rootScope.$safeApply null, ()->
+            deferred.resolve user.toJSON(true)
+        error: (e)->
+          $rootScope.$safeApply null, ()->
+            deferred.reject e
+
+      deferred.promise
+
+    @login = (username, password)->
+      deferred = $q.defer()
+      user = new Kinvey.User()
+      user.login $scope.email, $scope.password,
+        success: (user)->
+          $rootScope.$safeApply null, ()->
+            deferred.resolve user.toJSON(true)
+        error: (e)->
+          $rootScope.$safeApply null, ()->
+            deferred.reject e
+      deferred.promise
 
     @getAll = ()->
       deferred = $q.defer()
@@ -21,7 +66,7 @@ window.App
             deferred.resolve  (entry.toJSON(true) for index, entry of list)
         error: (e)->
           $rootScope.$safeApply null, ()->
-            deferred.reject(e)
+            deferred.reject e
       deferred.promise
 
     @setRole = (usr, role, enabled)->
@@ -63,28 +108,39 @@ window.App
       else
         false
 
+
+    roleCache = {}
     @hasAccess = (user, type)->
       deferred = $q.defer()
-
       if user.role?
         if user.role._id == type
           deferred.resolve true
         else
-          # We need to look up the role inheritence
-          roles = new Kinvey.Entity {}, 'roles',
-            store: 'cached'
+          cacheString = user.role._id+type
 
-          roles.load user.role._id,
-            success: (role)->
-              $rootScope.$safeApply null, ()->
-                deferred.resolve role.get('inherits') == type
-            error: (e)->
-              $rootScope.$safeApply null, ()->
-                deferred.reject
-                  message: e.description
+          # If we don't have this request cached for this round then update it
+          if !roleCache[cacheString]
+            roleCache[cacheString] = deferred
+            # We need to look up the role inheritence
+            roles = new Kinvey.Entity {}, 'roles',
+              store: 'cached'
+              options:
+                policy: 'cachefirst'
+
+            roles.load user.role._id,
+              success: (role)->
+                roleCache[user.role._id] = role
+                $rootScope.$safeApply null, ()->
+                  deferred.resolve role.get('inherits') == type
+              error: (e)->
+                $rootScope.$safeApply null, ()->
+                  deferred.reject
+                    message: e.description
+          else # Hey look, we have a request processing for this role right now
+            deferred = roleCache[cacheString]
+
       else
         deferred.resolve false
-
       deferred.promise
 
     @destroy = (usr)->
@@ -143,4 +199,22 @@ window.App
         error: (e)->
           $rootScope.$safeApply null, ()->
             deferred.reject(e)
+      deferred.promise
+
+    @create = (disbursement)->
+      deferred = $q.defer()
+      kDisbursement = new Kinvey.Entity
+        firstName: $scope.firstName
+        lastName: $scope.lastName
+        amount: $scope.amount
+      , 'disbursements'
+
+      kDisbursement.save
+        success: (kDisbursement)->
+          $rootScope.$safeApply null, ()->
+            deferred.resolve kDisbursement.toJSON(true)
+        error: (e)->
+          $rootScope.$safeApply null, ()->
+            deferred.reject(e)
+
       deferred.promise

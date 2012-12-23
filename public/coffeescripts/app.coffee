@@ -47,20 +47,6 @@ window.App = App = angular.module('innCrisis', [])
       else
         $scope.$apply(fn);
 
-  .service '$safeLocation', ($rootScope, $location)->
-    @path = (url, replace, reload)->
-      if !url?
-        $location.path()
-      else
-        if(reload || $rootScope.$$phase)
-          console.log 'PHASE'
-          window.location = url;
-        else
-          $rootScope.$safeApply null, ()->
-            $location.path url
-            if replace
-              $location.replace()
-
 
 
 DonateCtrl = ($scope)->
