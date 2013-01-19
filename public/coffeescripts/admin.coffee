@@ -191,17 +191,20 @@ LogoutCtrl = ($scope, $safeLocation, $users)->
   $users.logout()
   $safeLocation.path '/admin/login'
 
-DisburseCtrl = ($scope, $safeLocation, $disbursements)->
-  $scope.disburse = ()->
-    $disbursements.create
+DisburseCtrl = ($scope, $safeLocation, $disbursements, $notification)->
+  $scope.disburse = ()=>
+    disbursement =
       firstName: $scope.firstName
       lastName: $scope.lastName
       amount: $scope.amount
+
+    $disbursements.create(disbursement)
       .then (disbursement)->
-        $safeLocation.path '/admin/post-disburse/'+disbursement._id
+        console.log 'Disbursement Ctrl', disbursement
+#        $safeLocation.path '/admin/post-disburse/'+disbursement._id
       ,(e)->
-        $scope.$safeApply $scope, ()->
-          $scope.err = e.message
+        $notification.error
+          message: e.description
 
 PostDisburseCtrl = ($scope, $routeParams, disbursement)->
   $scope.disbursement = disbursement

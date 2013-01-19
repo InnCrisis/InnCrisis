@@ -45,10 +45,22 @@ window.App
     @login = (username, password)->
       deferred = $q.defer()
       user = new Kinvey.User()
-      user.login $scope.email, $scope.password,
+      user.login username, password,
         success: (user)->
           $rootScope.$safeApply null, ()->
             deferred.resolve user.toJSON(true)
+        error: (e)->
+          $rootScope.$safeApply null, ()->
+            deferred.reject e
+      deferred.promise
+
+    @logout = ()->
+      deferred = $q.defer()
+      user = new Kinvey.User()
+      user.logout
+        success: (user)->
+          $rootScope.$safeApply null, ()->
+            deferred.resolve true
         error: (e)->
           $rootScope.$safeApply null, ()->
             deferred.reject e
@@ -107,7 +119,6 @@ window.App
         role._id == type
       else
         false
-
 
     roleCache = {}
     @hasAccess = (user, type)->
@@ -203,14 +214,11 @@ window.App
 
     @create = (disbursement)->
       deferred = $q.defer()
-      kDisbursement = new Kinvey.Entity
-        firstName: $scope.firstName
-        lastName: $scope.lastName
-        amount: $scope.amount
-      , 'disbursements'
+      kDisbursement = new Kinvey.Entity disbursement, 'disbursements'
 
       kDisbursement.save
         success: (kDisbursement)->
+          console.log kDisbursement.toJSON(true)
           $rootScope.$safeApply null, ()->
             deferred.resolve kDisbursement.toJSON(true)
         error: (e)->
