@@ -158,7 +158,7 @@ LoginCtrl = ($scope, $safeLocation, $users)->
     $safeLocation.path '/admin/register'
 
   $scope.login = ()->
-    $users.login $scope.email, $scope.password
+    $users.login($scope.email, $scope.password)
       .then (user)->
         $safeLocation.path '/admin/home'
       , (err)->

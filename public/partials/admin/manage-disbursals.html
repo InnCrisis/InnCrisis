@@ -10,5 +10,12 @@
     <td>{{disbursal.firstName}}</td>
     <td>{{disbursal.lastName}}</td>
     <td>{{disbursal.amount | currency}}</td>
+    <td>
+      <div ng-repeat="donation in disbursal.matchedDonations">
+        {{donation.entryId}}<br>
+        {{donation.entry[0].wepay.payer_name}}<br>
+        {{donation.entry[0].wepay.amount}}
+      </div>
+    </td>
   </tr>
 </table>

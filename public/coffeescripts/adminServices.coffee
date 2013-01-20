@@ -24,7 +24,11 @@ window.App
           callback e
 
     @get = ()->
-      Kinvey.getCurrentUser().toJSON(true)
+      currentUser = Kinvey.getCurrentUser();
+      if currentUser
+        currentUser.toJSON(true)
+      else
+        null
 
     @register = (username, password, name)->
       deferred = $q.defer()
@@ -44,14 +48,18 @@ window.App
 
     @login = (username, password)->
       deferred = $q.defer()
-      user = new Kinvey.User()
-      user.login username, password,
-        success: (user)->
-          $rootScope.$safeApply null, ()->
-            deferred.resolve user.toJSON(true)
+      Kinvey.Store.Cached.clear
+        success: ()->
+          user = new Kinvey.User()
+          user.login username, password,
+            success: (user)->
+              $rootScope.$safeApply null, ()->
+                deferred.resolve user.toJSON(true)
+            error: (e)->
+              $rootScope.$safeApply null, ()->
+                deferred.reject e
         error: (e)->
-          $rootScope.$safeApply null, ()->
-            deferred.reject e
+          deferred.reject e
       deferred.promise
 
     @logout = ()->
@@ -120,35 +128,26 @@ window.App
       else
         false
 
-    roleCache = {}
     @hasAccess = (user, type)->
       deferred = $q.defer()
       if user.role?
         if user.role._id == type
           deferred.resolve true
         else
-          cacheString = user.role._id+type
+          # We need to look up the role inheritence
+          roles = new Kinvey.Entity {}, 'roles',
+            store: 'cached'
+            options:
+              policy: 'cachefirst-norefresh'
 
-          # If we don't have this request cached for this round then update it
-          if !roleCache[cacheString]
-            roleCache[cacheString] = deferred
-            # We need to look up the role inheritence
-            roles = new Kinvey.Entity {}, 'roles',
-              store: 'cached'
-              options:
-                policy: 'cachefirst'
-
-            roles.load user.role._id,
-              success: (role)->
-                roleCache[user.role._id] = role
-                $rootScope.$safeApply null, ()->
-                  deferred.resolve role.get('inherits') == type
-              error: (e)->
-                $rootScope.$safeApply null, ()->
-                  deferred.reject
-                    message: e.description
-          else # Hey look, we have a request processing for this role right now
-            deferred = roleCache[cacheString]
+          roles.load user.role._id,
+            success: (role)->
+              $rootScope.$safeApply null, ()->
+                deferred.resolve role.get('inherits') == type
+            error: (e)->
+              $rootScope.$safeApply null, ()->
+                deferred.reject
+                  message: e.description
 
       else
         deferred.resolve false
