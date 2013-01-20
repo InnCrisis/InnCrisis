@@ -11,6 +11,12 @@
     <td>{{donation.wepay.payer_name}}</td>
     <td>{{donation.wepay.amount | currency}}</td>
     <td>{{donation.wepay.payer_email}}</td>
-    <td>{{donation.matched}}</td>
+    <td>
+      <div ng-repeat="matchedDonation in donation.matchedDonations">
+        {{matchedDonation.entryId}}<br>
+        {{matchedDonation}}<br>
+        {{matchedDonation.amount}}
+      </div>
+    </td>
   </tr>
 </table>

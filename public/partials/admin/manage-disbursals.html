@@ -5,6 +5,7 @@
     <th>First Name</th>
     <th>Last Name</th>
     <th>Amount</th>
+    <th>Donors</th>
   </thead>
   <tr ng-repeat="disbursal in disbursements">
     <td>{{disbursal.firstName}}</td>
@@ -12,9 +13,8 @@
     <td>{{disbursal.amount | currency}}</td>
     <td>
       <div ng-repeat="donation in disbursal.matchedDonations">
-        {{donation.entryId}}<br>
-        {{donation.entry[0].wepay.payer_name}}<br>
-        {{donation.entry[0].wepay.amount}}
+        {{donation.entry[0].wepay.payer_name}} - {{donation.amount | currency}}
+        <br>
       </div>
     </td>
   </tr>

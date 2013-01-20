@@ -43,7 +43,6 @@ var populateDonation = function(modules, disbursement, cb){
         }else{
           subCounter--;
           matchedDonation.entry = response;
-          modules.logger.info(response);
           if(subCounter == 0){
             cb();
           }

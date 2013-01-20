@@ -12,7 +12,6 @@ function onPreSave(request, response, modules){
               response.body = {description: e.message };
               response.complete(500);
             }else{
-              modules.logger.info('Matched Donations: '+JSON.stringify(matchedDonations));
               request.body.matchedDonations = matchedDonations;
               response.continue();
             }
