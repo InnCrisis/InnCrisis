@@ -1,13 +1,17 @@
 function onPostFetch(request,response,modules){
 	var disbursements = response.body;
-  populateDonations(modules, disbursements, function(e, newDisbursements){
-    if(e){
-      response.continue();
-    }else{
-      response.body = newDisbursements;
-      response.continue();
-    }
-  });
+  if(disbursements.length){
+    populateDonations(modules, disbursements, function(e, newDisbursements){
+      if(e){
+        response.continue();
+      }else{
+        response.body = newDisbursements;
+        response.continue();
+      }
+    });
+  }else{
+    response.continue();
+  }
 }
 
 var populateDonations = function(modules, disbursements, cb){
@@ -34,11 +38,15 @@ var populateDonation = function(modules, disbursement, cb){
   for(var j=0;j<matchedDonations.length;j++){
     (function(matchedDonation){
       getDonation(modules,{_id: matchedDonation.entryId},function(e, response){
-        subCounter--;
-        matchedDonation.entry = response;
-        modules.logger.info(response);
-        if(subCounter == 0){
-          cb();
+        if(e){
+          cb(e);
+        }else{
+          subCounter--;
+          matchedDonation.entry = response;
+          modules.logger.info(response);
+          if(subCounter == 0){
+            cb();
+          }
         }
       });
     })(matchedDonations[j]);

@@ -200,8 +200,7 @@ DisburseCtrl = ($scope, $safeLocation, $disbursements, $notification)->
 
     $disbursements.create(disbursement)
       .then (disbursement)->
-        console.log 'Disbursement Ctrl', disbursement
-#        $safeLocation.path '/admin/post-disburse/'+disbursement._id
+        $safeLocation.path '/admin/post-disburse/'+disbursement._id
       ,(e)->
         $notification.error
           message: e.description
