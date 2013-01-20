@@ -5,17 +5,15 @@
     <th>Name</th>
     <th>Amount</th>
     <th>Email</th>
-    <th>Matched</th>
+    <th>Disbursals</th>
   </thead>
   <tr ng-repeat="donation in donations">
     <td>{{donation.wepay.payer_name}}</td>
     <td>{{donation.wepay.amount | currency}}</td>
     <td>{{donation.wepay.payer_email}}</td>
     <td>
-      <div ng-repeat="matchedDonation in donation.matchedDonations">
-        {{matchedDonation.entryId}}<br>
-        {{matchedDonation}}<br>
-        {{matchedDonation.amount}}
+      <div ng-repeat="matchedDisbursal in donation.matchedDisbursals">
+        {{matchedDisbursal.entry.firstName}} {{matchedDisbursal.entry.lastName}} - {{matchedDisbursal.amount | currency}}
       </div>
     </td>
   </tr>

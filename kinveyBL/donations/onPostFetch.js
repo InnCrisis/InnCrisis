@@ -33,12 +33,14 @@ var populateDisbersements = function(modules, donations, cb){
 }
 
 var populateDisbersment = function(modules, donation, cb){
+
+  var objectID = modules.collectionAccess.objectID;
   var matchedDisburals = donation.matchedDisbursals;
   if(matchedDisburals){
     var subCounter = matchedDisburals.length;
     for(var j=0;j<matchedDisburals.length;j++){
       (function(matchedDisbursal){
-        getDisbursal(modules,{_id: matchedDisbursal.entryId},function(e, response){
+        getDisbursal(modules,{_id: objectID(matchedDisbursal.entryId)},function(e, response){
           if(e){
             cb(e);
           }else{
@@ -55,10 +57,13 @@ var populateDisbersment = function(modules, donation, cb){
     cb();
   }
 }
-
 var getDisbursal = function(modules, query, cb){
-  modules.logger.info(query);
-  modules.collectionAccess.collection('disbursals').find(query, function(err, docs){
-     cb(err, docs);
+  modules.collectionAccess.collection('disbursements').findOne(query, function(err, docs){
+    if(err){
+      cb(err);
+    }else{
+      cb(null,docs);
+    }
+    cb(err, docs);
   });
 }
