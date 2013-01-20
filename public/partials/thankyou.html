@@ -1,7 +1,57 @@
 <section>
-  Thank you for your donation {{donation.wepay.payer_name}}
+  <p>Thank you for your donation {{donation.wepay.payer_name}}</p>
+  
+  <p>You donated {{donation.wepay.amount | currency:"$"}} on {{donation.wepay.create_time | moment:'MMMM Do YYYY'}}.</p> 
+  
+  <p>Your recpit number for this transaction is XXXXX</p>
+  
   <br>
-  You donated {{donation.wepay.amount | currency:"$"}} on {{donation.wepay.create_time | moment:'MMMM Do YYYY'}}
+  
+  <h4>Currently your Donation looks like:</h4>
+  
+  <ul class="unstyled">
+  <li>Donor: "Insert Display Name Here"
+  <li>Amount: {{donation.wepay.amount | currency:"$"}}
+  <li>Date: {{donation.wepay.create_time | moment:'MMMM Do YYYY'}}
+  </ul>
+  
   <br>
-  You can track your donation usage on this page.
+
+  <p>On {{donation.wepay.create_time | moment:'MMMM Do YYYY'}}, "Insert Display Name Here" dontated {{donation.wepay.amount | currency:"$"}} to the Cliff and Meranda fund for young children skipping. This kinds and enours dotation will be used to paint hopscotch....</p>
+  
+  <br>
+  
+  <h4>Would you like your dontation to be attributed differently?</h4>
+ <form ng-submit="donationdetails()">
+	<div class="control-group">
+	
+	<label class="radio">
+	<input type="radio" name="optionsRadios" id="attribution" value="realname" checked> {{donation.wepay.payer_name}}
+	</label>
+	
+	<label class="radio">
+	<input type="radio" name="optionsRadios" id="attribution" value="anon" checked> Anonymous
+	</label>
+	
+	<!--TODO: We need to go in and add some JavaScript here to make it so that entering text into the "Other" text box autoselects the radio button and selecting the radio button auto puts the cursor in the text box-->
+	
+	<label class="radio">
+	<input type="radio" name="optionsRadios" id="attribution" value="other" checked>     
+      <input type="text" id="othername" placeholder="Other" ng-model="donationAmount">
+	</label>
+	</div>
+
+	
+	<div class="control-group">
+        <span class="control-label" for="button">Would you like to add a picture?  </span>
+    <a class="btn btn-small" href="#"><i class="icon-camera"></i></a>
+	</div>
+	
+	<div class="control-group">
+    <div class="controls">
+      <input class="btm btm-primary" type="submit" value="Update Your Donation"/>
+    </div>
+  </div>
+
+  </form>
 </section>

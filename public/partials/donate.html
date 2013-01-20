@@ -1,7 +1,23 @@
 <section>
   We are NOT currently accepting actual donations. This is all testing data.
+  <h1>Donate to The Cause</h1>
   <form ng-submit="donate()">
-    <input name="amount" placeholder="20" ng-model="donationAmount"/>
-    <input type="submit" value="Donate"/>
+ 
+ 
+
+    <div class="control-group">
+    <label class="control-label" for="amount"> How Much would you like to donate?</label>
+    <div class="controls">
+      <input type="text" id="amount" placeholder="20.00" ng-model="donationAmount">
+    </div>
+      <span class="control-label" for="amount">We utilize WePay to securly accept your donation.</span>	
+  </div>
+  
+  <div class="control-group">
+    <div class="controls">
+      <input class="btm btm-primary" type="submit" value="Next"/>
+    </div>
+  </div>
+    
   </form>
 </section>
