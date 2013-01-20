@@ -173,7 +173,7 @@ RegisterCtrl = ($scope, $safeLocation, $users)->
     unless $scope.email.length and $scope.password.length && $scope.name
       $scope.error = 'All form fields are required'
     else
-      $users.register $scope.email, $scope.password, $scope.name
+      $users.register($scope.email, $scope.password, $scope.name)
         .then ()->
           $safeLocation.path '/admin/home'
         , (e)->
