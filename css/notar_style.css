@@ -1,0 +1,52 @@
+@charset "UTF-8";
+/* CSS Document */
+
+body {
+}
+
+
+h1 {
+	font-size: 25px;
+	font-family: "Courier New", Courier, monospace;
+	color: #36F;	
+	margin-left: 2px
+}
+
+
+section {
+	color: black;
+	font-family: "Courier New", Courier, monospace;
+	font-size: 16px;	
+	}
+
+
+#pix {
+	
+	margin: -18px 0 0 0px;	
+		
+	}
+
+p {
+	color: black;
+	font-family: "Courier New", Courier, monospac;
+	font-size: 16px;
+	
+}
+
+.control-group{
+	border: thick outset #06F;
+	padding: 20px 0 10px 10px;
+	margin: 5px 50px 0px 0px;
+	height: auto;
+	width: 500px;
+	
+}
+
+.tiny-box {
+	font-family: "Courier New", Courier, monospac;
+	font-size: 16px;
+	height: 50px;
+	width: 500px;
+	color: #903;
+	border: medium ridge #903;
+	}

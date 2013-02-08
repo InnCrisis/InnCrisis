@@ -1,23 +1,52 @@
+<HTML>
+	<HEAD>
+    	<link title="Inncrisis" href="/css/notar_style.css" 	rel=	"stylesheet" type="text/css" />
+       
+		
+ 	</HEAD>
+	<BODY> 
+
 <section>
-  We are NOT currently accepting actual donations. This is all testing data.
-  <h1>Donate to The Cause</h1>
+
+  <h1>Donate to The Cause  </h1>
   <form ng-submit="donate()">
  
  
 
     <div class="control-group">
-    <label class="control-label" for="amount"> How Much would you like to donate?</label>
-    <div class="controls">
-      <input type="text" id="amount" placeholder="20.00" ng-model="donationAmount">
+   
+      <label class="control-label" for="amount"> How Much would you like to donate?</label>
+<p>
+        <input type="text" id="amount" placeholder="20.00" ng-model="donationAmount">
+    
+
+    <p><span class="control-label" for="amount">We utilize WePay to securly accept your donation.</span></p>	
+    
+ 
+      <p>
+        <input class="btm btm-primary" type="submit" value="Next"/>
+      </p>
+      
+      <div id = "pix">
+      
+      <img src="/public/images/inncrisis.png" width="463" height="203" ">
+      
+      </div>
+   
+    
     </div>
-      <span class="control-label" for="amount">We utilize WePay to securly accept your donation.</span>	
-  </div>
-  
-  <div class="control-group">
-    <div class="controls">
-      <input class="btm btm-primary" type="submit" value="Next"/>
-    </div>
-  </div>
     
   </form>
 </section>
+
+<div class= "tiny-box">
+<strong> We are NOT currently accepting actual donations. This is all testing data.
+<div id= "pix"></div>
+</strong></div>
+
+
+ 
+
+
+</BODY>
+</HTML>
