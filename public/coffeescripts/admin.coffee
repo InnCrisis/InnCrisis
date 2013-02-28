@@ -76,20 +76,20 @@ window.App
     for routePath, route of getRoutes()
       $routeProvider.when routePath, route.arguments
 
-  .run ($rootScope, $safeLocation, $notification, $users)->
+  .run ($rootScope, $safeLocation, notification, users)->
     # Sometimes when we try to resolve a path we get a rejection due to security reasons or something else
     # This should be able to take the current page, stop rendering the template and render our error template
     $rootScope.$on '$routeChangeError', (event, current, previous, rejection)->
       currentPath = $safeLocation.path()
       if currentPath.indexOf('/admin') == 0
         if rejection
-          $notification.error
+          notification.error
             loaderError: true
             title: rejection.error
             message: rejection.description
 
         else
-          $notification.error
+          notification.error
             loaderError: true
             title: '404'
             message: 'Page not found'
@@ -97,17 +97,17 @@ window.App
     $rootScope.$on '$routeChangeStart', (evt, next, current)->
       currentPath = $safeLocation.path()
       if currentPath.indexOf('/admin') == 0
-        user = $users.get()
+        user = users.get()
         if !user? and !next.$route?.bypassLogin?
           $safeLocation.path('/admin/login')
 
     $rootScope.$on '$routeChangeSuccess', (evt, next, current)->
-      $notification.clear()
+      notification.clear()
 
 
-window.NavigationCtrl = ($rootScope, $scope, $location, $users)->
+window.NavigationCtrl = ($rootScope, $scope, $location, users)->
   getNavRoutes = (loading = false)->
-    user = $users.get()
+    user = users.get()
     routes = []
     for path, route of getRoutes()
       route.security ?= ''
@@ -129,7 +129,7 @@ window.NavigationCtrl = ($rootScope, $scope, $location, $users)->
       securityCheck = false
       if route.security.length
         if user
-          securityCheck = $users.hasAccess user, route.security
+          securityCheck = users.hasAccess user, route.security
       else
         securityCheck = true
 
@@ -153,19 +153,19 @@ window.NavigationCtrl = ($rootScope, $scope, $location, $users)->
     $scope.routes = getNavRoutes(false)
 
 
-LoginCtrl = ($scope, $safeLocation, $users)->
+LoginCtrl = ($scope, $safeLocation, users)->
   $scope.register = ()->
     $safeLocation.path '/admin/register'
 
   $scope.login = ()->
-    $users.login($scope.email, $scope.password)
+    users.login($scope.email, $scope.password)
       .then (user)->
         $safeLocation.path '/admin/home'
       , (err)->
         $scope.error = err.description
         $scope.$digest()
 
-RegisterCtrl = ($scope, $safeLocation, $users)->
+RegisterCtrl = ($scope, $safeLocation, users)->
   $scope.signIn = ()->
     $safeLocation.path '/admin/login'
 
@@ -173,7 +173,7 @@ RegisterCtrl = ($scope, $safeLocation, $users)->
     unless $scope.email.length and $scope.password.length && $scope.name
       $scope.error = 'All form fields are required'
     else
-      $users.register($scope.email, $scope.password, $scope.name)
+      users.register($scope.email, $scope.password, $scope.name)
         .then ()->
           $safeLocation.path '/admin/home'
         , (e)->
@@ -184,72 +184,72 @@ HomeCtrl = ($scope, user)->
   $scope.user = user
 
 HomeCtrl.resolve =
-  user: ($users)->
-    $users.get()
+  user: (users)->
+    users.get()
 
-LogoutCtrl = ($scope, $safeLocation, $users)->
-  $users.logout()
+LogoutCtrl = ($scope, $safeLocation, users)->
+  users.logout()
   $safeLocation.path '/admin/login'
 
-DisburseCtrl = ($scope, $safeLocation, $disbursements, $notification)->
+DisburseCtrl = ($scope, $safeLocation, disbursements, notification)->
   $scope.disburse = ()=>
     disbursement =
       firstName: $scope.firstName
       lastName: $scope.lastName
       amount: $scope.amount
 
-    $disbursements.create(disbursement)
+    disbursements.create(disbursement)
       .then (disbursement)->
         $safeLocation.path '/admin/post-disburse/'+disbursement._id
       ,(e)->
-        $notification.error
+        notification.error
           message: e.description
 
 PostDisburseCtrl = ($scope, $routeParams, disbursement)->
   $scope.disbursement = disbursement
 
 PostDisburseCtrl.resolve =
-  disbursement: ($route, $disbursements)->
-    $disbursements.getById($route.current.params.disburseId)
+  disbursement: ($route, disbursements)->
+    disbursements.getById($route.current.params.disburseId)
 
-UserManagementCtrl = ($scope, users, $users, $notification)->
+UserManagementCtrl = ($scope, users, users, notification)->
   $scope.users = users
 
   $scope.setRole = (user, role, enabled)->
-    $users.setRole(user, role, enabled)
+    users.setRole(user, role, enabled)
       .then (usr)->
         user.role = usr.role
       , (err)->
-        $notification.error
+        notification.error
           message: err.message
 
   $scope.isRole = (user, type)->
-    $users.isRole(user, type)
+    users.isRole(user, type)
 
   $scope.destroy = (user)->
-    $users.destroy(user)
+    users.destroy(user)
       .then ()->
-        $scope.users = $users.getAll()
+        $scope.users = users.getAll()
       , (err)->
         $scope.$parent.error = err
 
 
 UserManagementCtrl.resolve =
-  users: ($users)->
-    $users.getAll()
+  users: (users)->
+    users.getAll()
 
 
 ManageDisbursalsCtrl = ($scope, disbursements)->
   $scope.disbursements = disbursements
 
 ManageDisbursalsCtrl.resolve =
-  disbursements: ($disbursements)->
-    $disbursements.getAll()
+  disbursements: (disbursements)->
+    disbursements.getAll()
 
 
 DonationsCtrl = ($scope, donations)->
   $scope.donations = donations
 
 DonationsCtrl.resolve =
-  donations: ($donations)->
-    $donations.getAll()
+  donations: (donations)->
+    donations.getAll()

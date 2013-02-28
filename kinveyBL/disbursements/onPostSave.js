@@ -10,6 +10,7 @@ function onPostSave(request,response,modules){
         disbursementId:response.body._id
       },function(e){
         if(e){
+          modules.logger.error(e);
           response.body = {description: e.message};
           response.complete(e.statusCode);
         }else{
@@ -35,10 +36,14 @@ var bindMatchedDonation = function(modules, options, cb){
       }
     }},
     function(e){
-      cb({
-        message: e.message,
-        statusCode: 500
-      })
+      if(e){
+        cb({
+          message: e.message,
+          statusCode: 500
+        })
+      }else{
+        cb()
+      }
     }
   );
 }

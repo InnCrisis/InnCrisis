@@ -1,6 +1,7 @@
 function onPreSave(request, response, modules){
   hasAccess(modules, 'user', request.username, function(err, canAccess){
     if(err){
+      modules.logger.error(err);
       response.body = {description: err.message};
       response.complete(err.statusCode);
     }else if(canAccess){
@@ -9,6 +10,7 @@ function onPreSave(request, response, modules){
           // This is the first time, match to donation!
           matchDonations(request.body.amount, modules, function(e, matchedDonations){
             if(e){
+              modules.logger.error(e);
               response.body = {description: e.message };
               response.complete(500);
             }else{
@@ -58,6 +60,7 @@ var matchDonation = function(allDonations, amount, modules, cb){
     {sort:['createTime'], limit: 1},
     function (e, donations){
       if(e){
+        modules.logger.error(e);
         revertDonations(allDonations, e.message, cb);
       }else{
         if(!donations.length){
@@ -87,6 +90,7 @@ var matchDonation = function(allDonations, amount, modules, cb){
             {$set:{remaining:remaining-reductionAmount}},
             function(e, updatedDoc){
               if(e){
+                modules.logger.error(e);
                 revertDonations(allDonations, e.message, cb);
               }else{
                 //We have a successful update!
@@ -139,6 +143,7 @@ var hasAccess = function(modules, checkRole, username, cb){
   }else{
     modules.collectionAccess.collection('user').find({username: username}, function(err, users){
       if(err){
+        modules.logger.error(err);
         cb({
           message: err.message,
           statusCode: 500
@@ -149,6 +154,7 @@ var hasAccess = function(modules, checkRole, username, cb){
           if(user.role){
             modules.collectionAccess.collection('roles').find({_id: user.role._id}, function(err, roles){
               if(err){
+                modules.logger.error(err);
                 cb({
                   message: err.message,
                   statusCode: 500

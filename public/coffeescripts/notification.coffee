@@ -1,5 +1,5 @@
 window.App
-  .service '$notification', ($rootScope)->
+  .service 'notification', ($rootScope)->
     notificationTimeout = {}
     clear = @clear = ()->
       clearTimeout notificationTimeout

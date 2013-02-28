@@ -13,7 +13,7 @@ window.App
             if replace
               $location.replace()
 
-  .service '$users', ($q, $rootScope)->
+  .service 'users', ($q, $rootScope)->
     getById = (id, callback)->
       userEntity = new Kinvey.Entity({}, 'user');
       userEntity.load id,
@@ -171,7 +171,7 @@ window.App
 
       deferred.promise
 
-  .service '$donations', ($q, $rootScope)->
+  .service 'donations', ($q, $rootScope)->
     @getAll = ()->
       deferred = $q.defer()
       donations = new Kinvey.Collection('donations');
@@ -184,7 +184,7 @@ window.App
             deferred.reject e
       deferred.promise
 
-  .service '$disbursements', ($q, $rootScope)->
+  .service 'disbursements', ($q, $rootScope)->
     @getById = (id)->
       deferred = $q.defer()
       disbursements = new Kinvey.Entity {}, 'disbursements'
