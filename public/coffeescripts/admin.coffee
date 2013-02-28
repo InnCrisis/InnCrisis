@@ -212,8 +212,8 @@ PostDisburseCtrl.resolve =
   disbursement: ($route, disbursements)->
     disbursements.getById($route.current.params.disburseId)
 
-UserManagementCtrl = ($scope, users, users, notification)->
-  $scope.users = users
+UserManagementCtrl = ($scope, usersIn, users, notification)->
+  $scope.users = usersIn
 
   $scope.setRole = (user, role, enabled)->
     users.setRole(user, role, enabled)
@@ -235,7 +235,7 @@ UserManagementCtrl = ($scope, users, users, notification)->
 
 
 UserManagementCtrl.resolve =
-  users: (users)->
+  usersIn: (users)->
     users.getAll()
 
 
