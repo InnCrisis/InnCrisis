@@ -16,12 +16,17 @@
   </head>
   <body>
     {% block content %}
-      <header>
-        <a href="/">Inn Crisis</a>
-        <p id="description">Getting donations to those who need temporary housing.</p>
-      </header>
       <div class="container">
-          <div ng-view></div>
+        <div class="masthead">
+          <ul class="nav nav-pills pull-right">
+            <li><a href="http://www.inncrisis.org/">Home</a></li>
+            <li><a href="http://www.inncrisis.org/about">About</a></li>
+            <li><a href="http://www.inncrisis.org/contact">Contact</a></li>
+            <li class="active"><a href="/">Demo</a></li>
+          </ul>
+          <h3 class="muted">InnCrisis</h3>
+        </div>
+        <div ng-view></div>
       </div>
     {% endblock %}
   </body>
