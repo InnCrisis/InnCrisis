@@ -53,7 +53,7 @@ DonateCtrl = ($scope)->
   $scope.donate = ()->
     query = new Kinvey.Query()
     query.on('amount').equal( $scope.donationAmount )
-    query.on('redirectURI').equal( 'http://localhost:3000/thankyou' )
+    query.on('redirectURI').equal( "#{window.location.origin}/thankyou" )
 
     wepay = new Kinvey.Collection 'WePay',
       query: query
