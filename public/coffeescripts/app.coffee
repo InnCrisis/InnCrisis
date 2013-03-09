@@ -39,9 +39,8 @@ window.App = App = angular.module('innCrisis', [])
         else
           $location.path('/404').replace()
 
-    $rootScope.$safeApply = ($scope, fn)->
+    $rootScope.$safeApply = ($scope, fn = ->)->
       $scope = $scope || $rootScope;
-      fn = fn || ()->;
       if($scope.$$phase)
         fn();
       else
