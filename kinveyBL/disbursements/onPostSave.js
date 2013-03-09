@@ -16,7 +16,15 @@ function onPostSave(request,response,modules){
         }else{
           count--;
           if(count == 0){
-            response.continue();
+            populateDonation(modules, response.body, function(e){
+              if(e){
+                modules.logger.error(e);
+                response.body = {description: e.message};
+                response.complete(e.statusCode);
+              }else{
+                response.continue();
+              }
+            })
           }
         }
       });

@@ -1,0 +1,33 @@
+<h1>Disburse Money</h1>
+<form class="form-horizontal" ng-submit="updateDetails()">
+  <div class="control-group">
+    <label class="control-label" for="firstName">First Name</label>
+    <div class="controls">
+      <input type="text" id="firstName" placeholder="Bobby" ng-model="firstName">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="lastName">Last Name</label>
+    <div class="controls">
+      <input type="text" id="lastName" placeholder="Wilde" ng-model="lastName">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="partySize">Party Size</label>
+    <div class="controls">
+      <input type="number" id="partySize" placeholder="1" ng-model="partySize">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="message">Message</label>
+    <div class="controls">
+      <textarea id="message" placeholder="Thank you so much, you have helped my and my family of four." ng-model="message">
+      </textarea>
+    </div>
+  </div>
+  <div class="control-group">
+    <div class="controls">
+      <input class="btn" type="submit" value="Next"/>
+    </div>
+  </div>
+</form>

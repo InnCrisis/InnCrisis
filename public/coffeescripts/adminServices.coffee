@@ -216,8 +216,8 @@ window.App
       kDisbursement = new Kinvey.Entity disbursement, 'disbursements'
 
       kDisbursement.save
+        resolve: ['matchedDonations']
         success: (kDisbursement)->
-          console.log kDisbursement.toJSON(true)
           $rootScope.$safeApply null, ()->
             deferred.resolve kDisbursement.toJSON(true)
         error: (e)->

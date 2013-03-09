@@ -76,6 +76,10 @@ window.App
     for routePath, route of getRoutes()
       $routeProvider.when routePath, route.arguments
 
+    $routeProvider.when '/admin/disburse/user-details',
+      templateURL: '/partials/admin/disburse-user-details.html'
+      controller: DisburseUserDetailsCtrl
+
   .run ($rootScope, $safeLocation, notification, users)->
     # Sometimes when we try to resolve a path we get a rejection due to security reasons or something else
     # This should be able to take the current page, stop rendering the template and render our error template
@@ -204,6 +208,10 @@ DisburseCtrl = ($scope, $safeLocation, disbursements, notification)->
       ,(e)->
         notification.error
           message: e.description
+
+DisburseUserDetailsCtrl = ($scope, $safeLocation)->
+  console.log $scope.user
+  $scope.updateDetails = ()=>
 
 PostDisburseCtrl = ($scope, $routeParams, disbursement)->
   $scope.disbursement = disbursement
